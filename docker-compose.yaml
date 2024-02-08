@@ -1,0 +1,25 @@
+version: '3.0'
+
+services:
+  mytb:
+    restart: always
+    image: 'thingsboard/tb-postgres'
+    ports:
+      - '8080:9090'
+      - '1883:1883'
+    environment:
+      TB_QUEUE_TYPE: in-memory
+    volumes:
+      - ./.data/mytb-data:/data
+      - ./.data/mytb-logs:/var/log/thingsboard
+
+  # boat-emulator:
+  #   restart: always
+  #   image: boat-emulator
+  #   build:
+  #     dockerfile: ./Dockerfile
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - MQTT_URL=mqtt://mytb:1883
+  #     - MQTT_URL=mqtt://tb:1883
