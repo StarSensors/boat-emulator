@@ -10,6 +10,7 @@ import {
   // ResponseMsg,
   // TelemetryMsg,
   ConnectMsg,
+  TelemetryMsg,
   // Metric,
   // Device,
 } from './types'
@@ -85,7 +86,10 @@ export class TbGateway {
         device: device.name,
         type: device.deviceProfile.name,
       }
-      this.client.publish(CONNECT_TOPIC, JSON.stringify(connectMsg))
+
+      const connectMsgString = JSON.stringify(connectMsg)
+      this.logger.info(`Sending connect message for ${device.name}`)
+      this.client.publish(CONNECT_TOPIC, connectMsgString)
     })
 
     const attributesMsg: AttributesMsg = _.chain(devices)
@@ -94,7 +98,9 @@ export class TbGateway {
         ...d.attributes,
       }))
       .value()
-    this.client.publish(ATTRIBUTES_TOPIC, JSON.stringify(attributesMsg))
+    const attributesMsgString = JSON.stringify(attributesMsg)
+    this.logger.info('Sending attributes message')
+    this.client.publish(ATTRIBUTES_TOPIC, attributesMsgString)
 
     this.interval = setInterval(() => {
       this.publishTelemetry()
@@ -108,16 +114,20 @@ export class TbGateway {
 
   private publishTelemetry() {
     const ts = Date.now()
-    const msg = _.mapValues(this.state, ({ current }) => {
-      return [
-        {
-          ts,
-          values: current,
-        },
-      ]
-    })
-
-    this.client.publish('v1/gateway/telemetry', JSON.stringify(msg))
+    const telemetryMsg: TelemetryMsg = _.mapValues(
+      this.state,
+      ({ current }) => {
+        return [
+          {
+            ts,
+            values: current,
+          },
+        ]
+      },
+    )
+    const telemetryMsgString = JSON.stringify(telemetryMsg)
+    this.logger.info('Sending telemetry message')
+    this.client.publish('v1/gateway/telemetry', telemetryMsgString)
   }
 
   private setNewState() {
