@@ -68,13 +68,19 @@ export type Device = {
   id: string
   name: string
   deviceProfile: DeviceProfile
-  uid: string
   attributes: {
-    type: string
+    [key: string]: string | number
   }
   values: {
     [key: string]: number
   }
+}
+
+export type AssetProfileNames = 'Boat' | 'Compartment'
+
+export type Assets = {
+  name: string
+  profile: AssetProfileNames
 }
 
 export type MetricBehaviors = {

@@ -112,7 +112,7 @@ export class TbApi {
         try {
           await this.refreshToken()
         } catch (error) {
-          this.logger.error('Failed to login')
+          this.logger.error('Failed to refresh token')
           await this.login()
         }
       }
@@ -232,14 +232,20 @@ export class TbApi {
     return devices
   }
 
-  async getDeviceAttributes(
+  async getEntityAttributes(
+    entityType: TbEntityEnum = TbEntityEnum.DEVICE,
     deviceId: string,
-    scope: TbScopeEnum = TbScopeEnum.SERVER_SCOPE,
+    keys: string[] = [],
+    scope?: TbScopeEnum,
   ): Promise<{ [key: string]: string | number }[]> {
+    let url = `/api/plugins/telemetry/${entityType}/${deviceId}/values/attributes`
+
+    if (scope) {
+      url += `/${scope}`
+    }
+
     const response: AxiosResponse<{ [key: string]: string | number }[]> =
-      await this.api.get(
-        `/api/plugins/telemetry/DEVICE/${deviceId}/values/attributes/${scope}`,
-      )
+      await this.api.get(url, { params: { keys: keys.join(',') } })
 
     return response.data
   }
@@ -361,7 +367,7 @@ export class TbApi {
         throw new Error(errorStr)
       }
 
-      let tbDevice = tbDevices.find(tbDevice => tbDevice.name === device.uid)
+      let tbDevice = tbDevices.find(tbDevice => tbDevice.name === device.name)
 
       if (
         tbDevice &&
@@ -369,7 +375,7 @@ export class TbApi {
         tbDevice.externalId.id === device.id &&
         tbDevice.deviceProfileId?.entityType === TbEntityEnum.DEVICE_PROFILE &&
         tbDevice.deviceProfileId.id === tbDeviceProfile.id?.id &&
-        tbDevice.name === device.uid &&
+        tbDevice.name === device.name &&
         tbDevice.label === device.name
       ) {
         this.logger.info(`Device ${device.name}: In sync`)
@@ -382,8 +388,7 @@ export class TbApi {
         )
         tbDevice = {
           ...tbDevice,
-          name: device.uid,
-          label: device.name,
+          name: device.name,
           deviceProfileId: {
             entityType: TbEntityEnum.DEVICE_PROFILE,
             id: tbDeviceProfile.id?.id || 'unknown',
@@ -397,8 +402,7 @@ export class TbApi {
         this.logger.info(`Device ${device.name}: Creating new device.`)
 
         tbDevice = {
-          name: device.uid,
-          label: device.name,
+          name: device.name,
           deviceProfileId: {
             entityType: TbEntityEnum.DEVICE_PROFILE,
             id: tbDeviceProfile.id?.id || 'unknown',
@@ -421,9 +425,9 @@ export class TbApi {
     return response.data
   }
 
-  async upsertGatewayDevice(): Promise<TbDeviceInfo> {
-    const gatewayName = 'Boat Emulator Gateway'
-
+  async upsertGatewayDevice(
+    gatewayName = 'Boat Emulator Gateway',
+  ): Promise<TbDeviceInfo> {
     const tbDevices = await this.getDevices()
 
     const gateway = tbDevices.find(d => d.name === gatewayName)

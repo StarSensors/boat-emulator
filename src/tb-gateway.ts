@@ -5,6 +5,7 @@ import * as _ from 'lodash'
 // import { inspect } from 'util'
 
 import {
+  AttributesMsg,
   // AttributesMsg,
   // ResponseMsg,
   // TelemetryMsg,
@@ -43,12 +44,12 @@ export class TbGateway {
 
     this.state = _.chain(devices)
       .map(d => ({
-        uid: d.uid,
+        name: d.name,
         metrics: d.deviceProfile.metrics,
         previous: d.values,
         current: d.values,
       }))
-      .keyBy('uid')
+      .keyBy('name')
       .mapValues(d => ({
         ..._.pick(d, ['metrics', 'previous']),
         current: _.mapValues(d.current, (value, key) => {
@@ -65,11 +66,6 @@ export class TbGateway {
     })
     this.client.on('connect', this.onConnect.bind(this))
     this.client.on('message', this.onMessage.bind(this))
-
-    this.interval = setInterval(() => {
-      this.publishTelemetry()
-      this.setNewState()
-    }, 5000)
   }
 
   stop() {
@@ -85,12 +81,25 @@ export class TbGateway {
     this.client.subscribe(REQUEST_TOPIC + '+')
 
     devices.forEach(device => {
-      const ConnectMsg: ConnectMsg = {
-        device: device.uid,
+      const connectMsg: ConnectMsg = {
+        device: device.name,
         type: device.deviceProfile.name,
       }
-      this.client.publish(CONNECT_TOPIC, JSON.stringify(ConnectMsg))
+      this.client.publish(CONNECT_TOPIC, JSON.stringify(connectMsg))
     })
+
+    const attributesMsg: AttributesMsg = _.chain(devices)
+      .keyBy('name')
+      .mapValues(d => ({
+        ...d.attributes,
+      }))
+      .value()
+    this.client.publish(ATTRIBUTES_TOPIC, JSON.stringify(attributesMsg))
+
+    this.interval = setInterval(() => {
+      this.publishTelemetry()
+      this.setNewState()
+    }, 5000)
   }
 
   private onMessage(topic: string, message: Buffer) {

@@ -27,7 +27,9 @@ const boostrap = async () => {
   await tbApi.upsertDeviceProfiles(deviceProfiles)
   await tbApi.upsertDevices(devices)
 
-  const tbGatewayDevice = await tbApi.upsertGatewayDevice()
+  const tbGatewayDevice = await tbApi.upsertGatewayDevice(
+    'Boat Emulator Gateway',
+  )
   const accessToken = await tbApi.getDeviceAccessToken(
     tbGatewayDevice.name,
     tbGatewayDevice.id?.id || 'unknown',

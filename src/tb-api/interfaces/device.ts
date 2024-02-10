@@ -13,7 +13,7 @@ export type TbDevice = {
   ownerId?: TbEntity
   name: string
   type?: string
-  label: string
+  label?: string
   deviceProfileId?: TbEntity
   deviceData?: {
     configuration: any
