@@ -14,7 +14,7 @@ export const URI_MAPPING: Record<
     customer: {
       get: {
         single: {
-          byId: 'not-implemented',
+          byId: 'not-implemented', // /api/asset/{entityId}
           byName: 'not-implemented',
         },
         many: 'api/customer/{customerId}/assets', // page
