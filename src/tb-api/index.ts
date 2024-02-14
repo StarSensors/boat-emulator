@@ -382,13 +382,18 @@ export class TbApi {
     entity: T,
     config: AxiosRequestConfig | undefined = undefined,
   ): Promise<T> {
+    const uri = this.getUri(entityType, 'post')
+    this.logger.info(`Upserting entity ${entityType}`)
     const response: AxiosResponse<T> = await this.api.post<T>(
-      this.getUri(entityType, 'post'),
+      uri,
       entity,
       config,
     )
-
     return response.data
+  }
+
+  async getDevices(): Promise<TbDevice[]> {
+    return this.getEntities<TbDevice>('device')
   }
 
   // Asset profiles are synced by name only
@@ -600,6 +605,22 @@ export class TbApi {
     }
 
     return tbDevice
+  }
+
+  async upsertDeviceLabel(
+    deviceName: string,
+    label: string,
+  ): Promise<TbDevice> {
+    this.logger.info(`Setting label for device ${deviceName} to ${label}`)
+
+    const tbDevices = await this.getEntities<TbDevice>('device')
+    const tbDevice = _.find(tbDevices, { name: deviceName }) as TbDevice
+
+    if (!tbDevice) {
+      throw new Error(`Device ${deviceName}: Not found in device list`)
+    }
+
+    return await this.upsertEntity<TbDevice>('device', { ...tbDevice, label })
   }
 
   async upsertCustomer(customerTitle: string): Promise<TbCustomer> {

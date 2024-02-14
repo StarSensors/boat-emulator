@@ -140,6 +140,7 @@ const boostrap = async () => {
           await api.claimDevice(name, device.attributes.claimingData.secretKey)
 
           // set device label
+          const tbDevices = await api.getDevices()
         }
       }
     }

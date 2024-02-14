@@ -1,5 +1,17 @@
+import { TbAlarmRule } from './alarms'
 import { TbEntity } from './common'
 import { TbTransportEnum, TbProvisionTypeEnum } from './enums'
+
+export type TbDeviceProfileAlarm = {
+  id?: string
+  alarmType?: string
+  createRules?: Record<string, TbAlarmRule>
+  clearRule?: TbAlarmRule
+  propagate?: boolean
+  propagateToOwner?: boolean
+  propagateToTenant?: boolean
+  propagateRelationTypes?: string[]
+}
 
 export type TbDeviceProfileData = {
   configuration: {
@@ -10,9 +22,9 @@ export type TbDeviceProfileData = {
   }
   provisionConfiguration: {
     type: TbProvisionTypeEnum
-    provisionDeviceSecret: null
+    provisionDeviceSecret?: string | null
   }
-  alarms?: any
+  alarms?: TbDeviceProfileAlarm[]
 }
 
 export type TbDeviceProfile = {
@@ -30,7 +42,7 @@ export type TbDeviceProfile = {
   image?: string
   provisionDeviceKey?: string
   transportType?: TbTransportEnum
-  provisionType?: string
+  provisionType?: TbProvisionTypeEnum
   profileData: TbDeviceProfileData
   type: 'DEFAULT'
   defaultEdgeRuleChainId?: TbEntity
