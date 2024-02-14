@@ -11,6 +11,7 @@ export enum TbEntityEnum {
   DEVICE = 'DEVICE',
   ASSET = 'ASSET',
   DEVICE_PROFILE = 'DEVICE_PROFILE',
+  ASSET_PROFILE = 'ASSET_PROFILE',
 }
 
 export enum TbScopeEnum {

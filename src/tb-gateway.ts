@@ -92,15 +92,17 @@ export class TbGateway {
       this.client.publish(CONNECT_TOPIC, connectMsgString)
     })
 
-    const attributesMsg: AttributesMsg = _.chain(devices)
-      .keyBy('name')
-      .mapValues(d => ({
-        ...d.attributes,
-      }))
-      .value()
-    const attributesMsgString = JSON.stringify(attributesMsg)
-    this.logger.info('Sending attributes message')
-    this.client.publish(ATTRIBUTES_TOPIC, attributesMsgString)
+    // no need for the gateway to send attributes
+    //
+    // const attributesMsg: AttributesMsg = _.chain(devices)
+    //   .keyBy('name')
+    //   .mapValues(d => ({
+    //     ...d.attributes,
+    //   }))
+    //   .value()
+    // const attributesMsgString = JSON.stringify(attributesMsg)
+    // this.logger.info('Sending attributes message')
+    // this.client.publish(ATTRIBUTES_TOPIC, attributesMsgString)
 
     this.interval = setInterval(() => {
       this.publishTelemetry()

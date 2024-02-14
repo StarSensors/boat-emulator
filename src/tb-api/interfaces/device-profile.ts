@@ -15,28 +15,35 @@ export type TbDeviceProfileData = {
   alarms?: any
 }
 
-export type TbDeviceProfileInfo = {
+export type TbDeviceProfile = {
   id?: TbEntity
-  name: string
-  image?: string
-  dashboardId?: TbEntity
-  type: 'DEFAULT'
-  transportType: TbTransportEnum
-  tenantId?: TbEntity
-}
-
-export type TbDeviceProfile = TbDeviceProfileInfo & {
   createdTime?: number
-  customerId?: TbEntity
+  tenantId?: TbEntity
+  name: string
   default?: boolean
+  defaultDashboardId?: TbEntity
   defaultRuleChainId?: TbEntity
   defaultQueueName?: string
   firmwareId?: TbEntity
   softwareId?: TbEntity
   description?: string
+  image?: string
   provisionDeviceKey?: string
-  provisionType?: TbProvisionTypeEnum
-  defaultEdgeRuleChainId?: TbEntity
+  transportType?: TbTransportEnum
+  provisionType?: string
   profileData: TbDeviceProfileData
-  externalId: TbEntity
+  type: 'DEFAULT'
+  defaultEdgeRuleChainId?: TbEntity
+  externalId?: TbEntity
 }
+
+export type TbDeviceProfileInfo = Pick<
+  TbDeviceProfile,
+  | 'id'
+  | 'tenantId'
+  | 'name'
+  | 'image'
+  | 'defaultDashboardId'
+  | 'type'
+  | 'transportType'
+>

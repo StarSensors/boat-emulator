@@ -7,11 +7,12 @@ export type TbUser = {
   tenantId?: TbEntity
   customerId?: TbEntity
   email: string
-  name: string
+  name?: string
   authority: TbAuthorityEnum
   firstName?: string
-  lastname?: string
+  lastName?: string
   phone?: string
   additionalInfo?: any
-  ownerId?: TbEntity
 }
+
+export type TbUserActivationLink = string
