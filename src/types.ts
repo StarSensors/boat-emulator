@@ -87,7 +87,7 @@ export type AssetProfile = {
 
 export type Asset = {
   name: string
-  label?: string
+  label: string
   assetProfile: AssetProfile
   devices?: any[]
 }

@@ -309,11 +309,24 @@ export class TbApi {
     return entities
   }
 
-  getUri(entityType: TbApiEntity, type: 'get' | 'post') {
-    const uri = URI_MAPPING[entityType][this.clientType][type].many.replace(
-      '{customerId}',
-      this.customerId || '',
-    )
+  getUri(
+    entityType: TbApiEntity,
+    method: 'get' | 'post',
+    pluralType: 'single' | 'many',
+    byType?: 'byId' | 'byName',
+  ) {
+    let uri
+    if (method === 'get' && pluralType === 'single' && byType) {
+      uri = URI_MAPPING[entityType][this.clientType][method][pluralType][
+        byType
+      ] as string
+    } else {
+      uri = URI_MAPPING[entityType][this.clientType][method][
+        pluralType
+      ] as string
+    }
+
+    uri = uri.replace('{customerId}', this.customerId || '')
 
     if (!uri) {
       throw new Error(`Entity type ${entityType} not supported`)
@@ -325,7 +338,7 @@ export class TbApi {
       )
     } else if (uri === 'not-implemented') {
       throw new Error(
-        `Entity type ${entityType} not implemented for ${this.clientType} client type`,
+        `Entity type ${entityType} ${method} ${pluralType} not implemented for ${this.clientType} client type`,
       )
     }
     return uri
@@ -343,7 +356,7 @@ export class TbApi {
   ): Promise<TbPageData<T>> {
     const response: AxiosResponse<TbPageData<T>> = await this.api.get<
       TbPageData<T>
-    >(this.getUri(entityType, 'get'), { params: query })
+    >(this.getUri(entityType, 'get', 'many'), { params: query })
 
     return response.data
   }
@@ -382,7 +395,7 @@ export class TbApi {
     entity: T,
     config: AxiosRequestConfig | undefined = undefined,
   ): Promise<T> {
-    const uri = this.getUri(entityType, 'post')
+    const uri = this.getUri(entityType, 'post', 'single')
     this.logger.info(`Upserting entity ${entityType}`)
     const response: AxiosResponse<T> = await this.api.post<T>(
       uri,
@@ -607,10 +620,7 @@ export class TbApi {
     return tbDevice
   }
 
-  async upsertDeviceLabel(
-    deviceName: string,
-    label: string,
-  ): Promise<TbDevice> {
+  async setDeviceLabel(deviceName: string, label: string): Promise<TbDevice> {
     this.logger.info(`Setting label for device ${deviceName} to ${label}`)
 
     const tbDevices = await this.getEntities<TbDevice>('device')
@@ -621,6 +631,19 @@ export class TbApi {
     }
 
     return await this.upsertEntity<TbDevice>('device', { ...tbDevice, label })
+  }
+
+  async setAssetLabel(assetName: string, label: string): Promise<TbAsset> {
+    this.logger.info(`Setting label for asset ${assetName} to ${label}`)
+
+    const tbAssets = await this.getEntities<TbAsset>('asset')
+    const tbAsset = _.find(tbAssets, { name: assetName }) as TbAsset
+
+    if (!tbAsset) {
+      throw new Error(`Asset ${assetName}: Not found in asset list`)
+    }
+
+    return await this.upsertEntity<TbAsset>('asset', { ...tbAsset, label })
   }
 
   async upsertCustomer(customerTitle: string): Promise<TbCustomer> {

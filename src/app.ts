@@ -28,19 +28,21 @@ const logger = pino({
 const tenantApi = new TbApi(config.tb, logger)
 
 // gateway
-// const tbGateway = new TbGateway(config.mqtt.url, logger)
+const tbGateway = new TbGateway(config.mqtt.url, logger)
 
 const boostrap = async () => {
   await tenantApi.start()
 
   // provision device profiles
-  _.each(deviceProfiles, async deviceProfile => {
-    await tenantApi.upsertDeviceProfile(
-      deviceProfile.name,
-      deviceProfile.id,
-      deviceProfile.description,
-    )
-  })
+  await Promise.all(
+    _.map(deviceProfiles, deviceProfile =>
+      tenantApi.upsertDeviceProfile(
+        deviceProfile.name,
+        deviceProfile.id,
+        deviceProfile.description,
+      ),
+    ),
+  )
 
   // provision devices
   const tBdevices = await Promise.all(
@@ -59,6 +61,7 @@ const boostrap = async () => {
       )
     }
   }
+
   // provision asset profiles
   await Promise.all(
     _.map(assetProfiles, assetProfile =>
@@ -121,10 +124,10 @@ const boostrap = async () => {
     ),
   }))
 
-  // users login
+  // users login after activation
   await Promise.all(_.map(userApis, async ({ api }) => await api.start()))
 
-  // user actions after activation
+  // user actions
   for (const userApi of userApis) {
     const { api, customer } = userApi
     const customerAssets = _.filter(
@@ -133,31 +136,32 @@ const boostrap = async () => {
     )
 
     for (const asset of customerAssets) {
-      for (const { name } of asset.devices || []) {
+      // set user specific asset label
+      await api.setAssetLabel(asset.name, asset.label)
+
+      for (const { name, label } of asset.devices || []) {
         const device = _.find(devices, { name })
         if (device) {
           // claim device
           await api.claimDevice(name, device.attributes.claimingData.secretKey)
 
-          // set device label
-          const tbDevices = await api.getDevices()
+          // set user specific device label
+          await api.setDeviceLabel(name, label)
         }
       }
     }
-
-    // mimic user device and asset naming (labeling)
   }
 
-  // // add gateway device (will be used to send data to ThingsBoard)
-  // const tbGatewayDevice = await tenantApi.upsertGatewayDevice(
-  //   'Boat Emulator Gateway',
-  // )
-  // const accessToken = await tenantApi.getCachedDeviceAccessToken(
-  //   tbGatewayDevice.name,
-  //   tbGatewayDevice.id?.id || 'unknown',
-  // )
+  // add gateway device (will be used to send data to ThingsBoard)
+  const tbGatewayDevice = await tenantApi.upsertGatewayDevice(
+    'Boat Emulator Gateway',
+  )
+  const accessToken = await tenantApi.getCachedDeviceAccessToken(
+    tbGatewayDevice.name,
+    tbGatewayDevice.id?.id || 'unknown',
+  )
   // start the gateway
-  // tbGateway.start(accessToken)
+  tbGateway.start(accessToken)
 }
 
 boostrap()
