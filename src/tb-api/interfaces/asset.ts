@@ -1,6 +1,6 @@
 import { TbEntity } from './common'
 
-export type TbDevice = {
+export type TbAsset = {
   id?: TbEntity
   createdTime?: number
   tenantId?: TbEntity
@@ -8,20 +8,14 @@ export type TbDevice = {
   name: string
   type?: string
   label?: string
-  deviceProfileId?: TbEntity
-  deviceData?: {
-    configuration: any
-    transportConfiguration: any
-  }
-  firmwareId?: TbEntity
-  softwareId?: TbEntity
+  assetProfileId?: TbEntity
   additionalInfo?: any
   externalId?: TbEntity
 }
 
-export type TbDeviceInfo = TbDevice & {
+export type TbAssetInfo = TbAsset & {
+  tenantName?: string
   customerTitle?: string
+  assetProfileName?: string
   customerIsPublic?: boolean
-  deviceProfileName?: string
-  active?: boolean
 }

@@ -11,6 +11,8 @@ export enum TbEntityEnum {
   DEVICE = 'DEVICE',
   ASSET = 'ASSET',
   DEVICE_PROFILE = 'DEVICE_PROFILE',
+  ASSET_PROFILE = 'ASSET_PROFILE',
+  DASHBOARD = 'DASHBOARD',
 }
 
 export enum TbScopeEnum {
@@ -32,4 +34,31 @@ export enum TbProvisionTypeEnum {
   CHECK_PRE_PROVISIONED_DEVICES = 'CHECK_PRE_PROVISIONED_DEVICES',
   DISABLED = 'DISABLED',
   X509_CERTIFICATE_CHAIN = 'X509_CERTIFICATE_CHAIN',
+}
+
+export enum TbAlarmConditionFilterKeyEnum {
+  ATTRIBUTE = 'ATTRIBUTE',
+  CONSTANT = 'CONSTANT',
+  ENTITY_FIELD = 'ENTITY_FIELD',
+  TIME_SERIES = 'TIME_SERIES',
+}
+
+export enum TbAlarmConditionFilterValueTypeEnum {
+  BOOLEAN = 'BOOLEAN',
+  DATE_TIME = 'DATE_TIME',
+  NUMERIC = 'NUMERIC',
+  STRING = 'STRING',
+}
+
+export enum TbDynamicValueStringSourceTypeEnum {
+  CURRENT_CUSTOMER = 'CURRENT_CUSTOMER',
+  CURRENT_DEVICE = 'CURRENT_DEVICE',
+  CURRENT_TENANT = 'CURRENT_TENANT',
+  CURRENT_USER = 'CURRENT_USER',
+}
+
+export enum TbAlarmScheduleTypeEnum {
+  ANY_TIME = 'ANY_TIME',
+  CUSTOM = 'CUSTOM',
+  SPECIFIC_TIME = 'SPECIFIC_TIME',
 }

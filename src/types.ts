@@ -1,9 +1,3 @@
-export type TbApiOptions = {
-  baseUrl: string
-  tenantAdminUsername: string
-  tenantAdminPassword: string
-}
-
 export type ConnectMsg = { device: string; type: string }
 
 export type DisconnectMsg = { device: string; type: string }
@@ -36,51 +30,66 @@ export type ResponseMsg = {
 }
 
 export type Metric =
-  | 'battery_level_sensor'
   | 'battery_level'
-  | 'battery_voltage_sensor'
   | 'battery_voltage'
   | 'close_counter'
   | 'close'
   | 'humidity'
   | 'movement_counter'
+  | 'sensor_battery_level'
+  | 'sensor_battery_voltage'
   | 'temperature'
   | 'water'
 
 export type DeviceProfileName =
-  | 'Bridge Model 001'
-  | 'Water Sensor Model 001'
   | 'Battery Monitor Model 001'
   | 'Battery Monitor Model 002'
+  | 'Bridge Model 001'
   | 'Environmental Sensor Model 001'
   | 'Environmental Sensor Model 002'
   | 'Hall Sensor Model 001'
+  | 'Water Sensor Model 001'
+
+export type DeviceProfileType = 'sensor' | 'bridge'
 
 export type DeviceProfile = {
   id: string
   name: DeviceProfileName
   description?: string
   metrics: Metric[]
-  type: 'sensor' | 'bridge'
+  type: DeviceProfileType
 }
 
 export type Device = {
   id: string
   name: string
+  label: string
   deviceProfile: DeviceProfile
   attributes: {
-    [key: string]: string | number
+    uid: string
+    type: DeviceProfileType
+    claimingAllowed: true
+    claimingData: {
+      secretKey: string
+      expirationTime: number
+    }
   }
   values: {
     [key: string]: number
   }
 }
 
-export type AssetProfileNames = 'Boat' | 'Compartment'
+export type AssetProfileName = 'Boat' | 'Boat compartment' | 'Harbor'
 
-export type Assets = {
+export type AssetProfile = {
+  name: AssetProfileName
+}
+
+export type Asset = {
   name: string
-  profile: AssetProfileNames
+  label: string
+  assetProfile: AssetProfile
+  devices?: any[]
 }
 
 export type MetricBehaviors = {
@@ -91,4 +100,17 @@ export type MetricBehaviors = {
     start: number
     trend?: 'up' | 'down'
   }
+}
+
+export type Customer = {
+  title: string
+  boat: string
+}
+
+export type User = {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  customer: Customer
 }

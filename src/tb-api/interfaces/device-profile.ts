@@ -1,5 +1,17 @@
+import { TbAlarmRule } from './alarms'
 import { TbEntity } from './common'
 import { TbTransportEnum, TbProvisionTypeEnum } from './enums'
+
+export type TbDeviceProfileAlarm = {
+  id?: string
+  alarmType?: string
+  createRules?: Record<string, TbAlarmRule>
+  clearRule?: TbAlarmRule
+  propagate?: boolean
+  propagateToOwner?: boolean
+  propagateToTenant?: boolean
+  propagateRelationTypes?: string[]
+}
 
 export type TbDeviceProfileData = {
   configuration: {
@@ -10,33 +22,40 @@ export type TbDeviceProfileData = {
   }
   provisionConfiguration: {
     type: TbProvisionTypeEnum
-    provisionDeviceSecret: null
+    provisionDeviceSecret?: string | null
   }
-  alarms?: any
+  alarms?: TbDeviceProfileAlarm[]
 }
 
-export type TbDeviceProfileInfo = {
+export type TbDeviceProfile = {
   id?: TbEntity
-  name: string
-  image?: string
-  dashboardId?: TbEntity
-  type: 'DEFAULT'
-  transportType: TbTransportEnum
-  tenantId?: TbEntity
-}
-
-export type TbDeviceProfile = TbDeviceProfileInfo & {
   createdTime?: number
-  customerId?: TbEntity
+  tenantId?: TbEntity
+  name: string
   default?: boolean
+  defaultDashboardId?: TbEntity
   defaultRuleChainId?: TbEntity
   defaultQueueName?: string
   firmwareId?: TbEntity
   softwareId?: TbEntity
   description?: string
+  image?: string
   provisionDeviceKey?: string
+  transportType?: TbTransportEnum
   provisionType?: TbProvisionTypeEnum
-  defaultEdgeRuleChainId?: TbEntity
   profileData: TbDeviceProfileData
-  externalId: TbEntity
+  type: 'DEFAULT'
+  defaultEdgeRuleChainId?: TbEntity
+  externalId?: TbEntity
 }
+
+export type TbDeviceProfileInfo = Pick<
+  TbDeviceProfile,
+  | 'id'
+  | 'tenantId'
+  | 'name'
+  | 'image'
+  | 'defaultDashboardId'
+  | 'type'
+  | 'transportType'
+>

@@ -4,6 +4,9 @@ import { Device } from '../types'
 import { DeviceProfile } from '../types'
 import { deviceProfiles } from './device-profiles'
 
+const aYearFromNow = new Date()
+aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1)
+
 const deviceInfo = [
   {
     id: '6d806d50-9bd5-4625-a64a-42cfba4f6001',
@@ -11,6 +14,7 @@ const deviceInfo = [
     deviceProfile: 'Bridge Model 001',
     attributes: {
       uid: 'd5d7bcffff5fd001',
+      claimingData: { secretKey: 'bridge-001', expirationTime: +aYearFromNow },
     },
   },
   {
@@ -19,6 +23,7 @@ const deviceInfo = [
     deviceProfile: 'Bridge Model 001',
     attributes: {
       uid: 'd5d7bcffff5fd002',
+      claimingData: { secretKey: 'bridge-002', expirationTime: +aYearFromNow },
     },
   },
   {
@@ -27,6 +32,7 @@ const deviceInfo = [
     deviceProfile: 'Bridge Model 001',
     attributes: {
       uid: 'd5d7bcffff5fd003',
+      claimingData: { secretKey: 'bridge-003', expirationTime: +aYearFromNow },
     },
   },
   {
@@ -35,6 +41,10 @@ const deviceInfo = [
     deviceProfile: 'Water Sensor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:00',
+      claimingData: {
+        secretKey: 'water-sensor-001',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -43,6 +53,10 @@ const deviceInfo = [
     deviceProfile: 'Water Sensor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:01',
+      claimingData: {
+        secretKey: 'water-sensor-002',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -51,6 +65,10 @@ const deviceInfo = [
     deviceProfile: 'Water Sensor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:02',
+      claimingData: {
+        secretKey: 'water-sensor-003',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -59,6 +77,10 @@ const deviceInfo = [
     deviceProfile: 'Battery Monitor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:03',
+      claimingData: {
+        secretKey: 'battery-monitor-001',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -67,6 +89,10 @@ const deviceInfo = [
     deviceProfile: 'Battery Monitor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:04',
+      claimingData: {
+        secretKey: 'battery-monitor-002',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -75,6 +101,10 @@ const deviceInfo = [
     deviceProfile: 'Battery Monitor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:05',
+      claimingData: {
+        secretKey: 'battery-monitor-003',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -83,6 +113,10 @@ const deviceInfo = [
     deviceProfile: 'Battery Monitor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:06',
+      claimingData: {
+        secretKey: 'battery-monitor-004',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -91,6 +125,10 @@ const deviceInfo = [
     deviceProfile: 'Battery Monitor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:07',
+      claimingData: {
+        secretKey: 'battery-monitor-005',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -99,6 +137,10 @@ const deviceInfo = [
     deviceProfile: 'Battery Monitor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:08',
+      claimingData: {
+        secretKey: 'battery-monitor-006',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -107,6 +149,10 @@ const deviceInfo = [
     deviceProfile: 'Battery Monitor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:09',
+      claimingData: {
+        secretKey: 'battery-monitor-007',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -115,6 +161,10 @@ const deviceInfo = [
     deviceProfile: 'Battery Monitor Model 002',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:0a',
+      claimingData: {
+        secretKey: 'battery-monitor-010',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -123,6 +173,10 @@ const deviceInfo = [
     deviceProfile: 'Battery Monitor Model 002',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:0b',
+      claimingData: {
+        secretKey: 'battery-monitor-011',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -131,6 +185,10 @@ const deviceInfo = [
     deviceProfile: 'Battery Monitor Model 002',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:0c',
+      claimingData: {
+        secretKey: 'battery-monitor-012',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -139,6 +197,10 @@ const deviceInfo = [
     deviceProfile: 'Environmental Sensor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:0d',
+      claimingData: {
+        secretKey: 'environmental-sensor-001',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -147,6 +209,10 @@ const deviceInfo = [
     deviceProfile: 'Environmental Sensor Model 002',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:0e',
+      claimingData: {
+        secretKey: 'environmental-sensor-002',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -155,6 +221,10 @@ const deviceInfo = [
     deviceProfile: 'Environmental Sensor Model 002',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:0f',
+      claimingData: {
+        secretKey: 'environmental-sensor-003',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -163,6 +233,10 @@ const deviceInfo = [
     deviceProfile: 'Hall Sensor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:10',
+      claimingData: {
+        secretKey: 'hall-sensor-001',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -171,6 +245,10 @@ const deviceInfo = [
     deviceProfile: 'Hall Sensor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:11',
+      claimingData: {
+        secretKey: 'hall-sensor-002',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -179,6 +257,10 @@ const deviceInfo = [
     deviceProfile: 'Hall Sensor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:12',
+      claimingData: {
+        secretKey: 'hall-sensor-003',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -187,6 +269,10 @@ const deviceInfo = [
     deviceProfile: 'Hall Sensor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:13',
+      claimingData: {
+        secretKey: 'hall-sensor-004',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
   {
@@ -195,6 +281,10 @@ const deviceInfo = [
     deviceProfile: 'Hall Sensor Model 001',
     attributes: {
       uid: 'aa:bb:cc:dd:ee:14',
+      claimingData: {
+        secretKey: 'hall-sensor-005',
+        expirationTime: +aYearFromNow,
+      },
     },
   },
 ]
@@ -216,10 +306,13 @@ export const devices: Device[] = deviceInfo.map(info => {
   return {
     id: info.id,
     name: info.name,
+    label: info.name,
     deviceProfile: deviceProfile,
     attributes: {
-      type,
       uid: info.attributes.uid,
+      type,
+      claimingAllowed: true,
+      claimingData: info.attributes.claimingData,
     },
     values,
   }

@@ -1,4 +1,10 @@
-import { TbEntityEnum } from './enums'
+import {
+  TbEntityEnum,
+  TbAlarmConditionFilterKeyEnum,
+  TbAlarmConditionFilterValueTypeEnum,
+  TbDynamicValueStringSourceTypeEnum,
+  TbAlarmScheduleTypeEnum,
+} from './enums'
 
 export type ITbAlarm = {
   id: TbEntityEnum
@@ -32,4 +38,40 @@ export type ITbAlarm = {
     lastName: string
   }
   status: string
+}
+
+export type TbAlarmConditionFilterKey = {
+  type?: TbAlarmConditionFilterKeyEnum
+  key?: string
+}
+
+export type TbAlarmConditionFilter = {
+  key?: TbAlarmConditionFilterKey
+  valueType?: TbAlarmConditionFilterValueTypeEnum
+  value?: object
+  predicate?: object
+}
+
+export type TbAlarmCondition = {
+  condition?: TbAlarmConditionFilter[]
+  /** JSON object representing alarm condition type */
+  spec?: object
+}
+
+export type TbDynamicValueString = {
+  inherit?: boolean
+  sourceAttribute?: string
+  sourceType?: TbDynamicValueStringSourceTypeEnum
+}
+
+export type TbAlarmSchedule = {
+  dynamicValue?: TbDynamicValueString
+  type?: TbAlarmScheduleTypeEnum
+}
+
+export type TbAlarmRule = {
+  condition?: TbAlarmCondition
+  schedule?: TbAlarmSchedule
+  alarmDetails?: string
+  dashboardId?: TbEntityEnum
 }
