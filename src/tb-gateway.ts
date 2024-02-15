@@ -152,16 +152,16 @@ export class TbGateway {
     behavior: { step: number; min: number; max: number },
   ): number {
     switch (metric) {
-      case 'battery_level_sensor':
       case 'battery_level':
-      case 'battery_voltage_sensor':
       case 'battery_voltage':
+      case 'close_counter':
+      case 'close':
       case 'humidity':
+      case 'movement_counter':
+      case 'sensor_battery_level':
+      case 'sensor_battery_voltage':
       case 'temperature':
       case 'water':
-      case 'close':
-      case 'close_counter':
-      case 'movement_counter':
         return this.getNewValueGeneric(value, behavior)
       default:
         throw new Error(`No behavior found for metric ${metric}`)
