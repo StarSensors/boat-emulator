@@ -1,5 +1,5 @@
 import { TbAlarmRule } from './alarms'
-import { TbEntity } from './common'
+import { TbEntityId } from './common'
 import { TbTransportEnum, TbProvisionTypeEnum } from './enums'
 
 export type TbDeviceProfileAlarm = {
@@ -28,16 +28,16 @@ export type TbDeviceProfileData = {
 }
 
 export type TbDeviceProfile = {
-  id?: TbEntity
+  id?: TbEntityId
   createdTime?: number
-  tenantId?: TbEntity
+  tenantId?: TbEntityId
   name: string
   default?: boolean
-  defaultDashboardId?: TbEntity
-  defaultRuleChainId?: TbEntity
+  defaultDashboardId?: TbEntityId
+  defaultRuleChainId?: TbEntityId
   defaultQueueName?: string
-  firmwareId?: TbEntity
-  softwareId?: TbEntity
+  firmwareId?: TbEntityId
+  softwareId?: TbEntityId
   description?: string
   image?: string
   provisionDeviceKey?: string
@@ -45,8 +45,8 @@ export type TbDeviceProfile = {
   provisionType?: TbProvisionTypeEnum
   profileData: TbDeviceProfileData
   type: 'DEFAULT'
-  defaultEdgeRuleChainId?: TbEntity
-  externalId?: TbEntity
+  defaultEdgeRuleChainId?: TbEntityId
+  externalId?: TbEntityId
 }
 
 export type TbDeviceProfileInfo = Pick<

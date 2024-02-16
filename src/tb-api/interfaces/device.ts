@@ -1,22 +1,22 @@
-import { TbEntity } from './common'
+import { TbEntityId } from './common'
 
 export type TbDevice = {
-  id?: TbEntity
+  id?: TbEntityId
   createdTime?: number
-  tenantId?: TbEntity
-  customerId?: TbEntity
+  tenantId?: TbEntityId
+  customerId?: TbEntityId
   name: string
   type?: string
   label?: string
-  deviceProfileId?: TbEntity
+  deviceProfileId?: TbEntityId
   deviceData?: {
     configuration: any
     transportConfiguration: any
   }
-  firmwareId?: TbEntity
-  softwareId?: TbEntity
+  firmwareId?: TbEntityId
+  softwareId?: TbEntityId
   additionalInfo?: any
-  externalId?: TbEntity
+  externalId?: TbEntityId
 }
 
 export type TbDeviceInfo = TbDevice & {

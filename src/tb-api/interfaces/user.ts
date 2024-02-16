@@ -1,11 +1,11 @@
-import { TbEntity } from './common'
+import { TbEntityId } from './common'
 import { TbAuthorityEnum } from './enums'
 
 export type TbUser = {
-  id?: TbEntity
+  id?: TbEntityId
   createdTime?: number
-  tenantId?: TbEntity
-  customerId?: TbEntity
+  tenantId?: TbEntityId
+  customerId?: TbEntityId
   email: string
   name?: string
   authority: TbAuthorityEnum

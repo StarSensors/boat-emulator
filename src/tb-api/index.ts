@@ -24,6 +24,7 @@ import {
   TbProvisionTypeEnum,
   TbEntityEnum,
   TbAuthorityEnum,
+  TbRelationTypeGroupEnum,
 } from './interfaces/enums'
 import { TbAsset } from './interfaces/asset'
 import { TbAssetProfile } from './interfaces/asset-profile'
@@ -33,6 +34,7 @@ import { TbUser, TbUserActivationLink } from './interfaces/user'
 
 // constants
 import { URI_MAPPING } from './constants'
+import { TbRelationsQuery } from './interfaces/relation'
 
 export class TbApi {
   private readonly clientType: TbClientType
@@ -816,5 +818,75 @@ export class TbApi {
         throw error
       }
     }
+  }
+
+  async saveRelation() {
+    /*
+{
+  "from": {
+    "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+    "entityType": "DEVICE"
+  },
+  "to": {
+    "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+    "entityType": "DEVICE"
+  },
+  "type": "Contains",
+  "typeGroup": "COMMON",
+  "additionalInfo": {}
+}
+    */
+  }
+
+  async getRelation(
+    fromId: string,
+    fromType: TbEntityEnum,
+    relationType: string,
+    relationTypeGroup: TbRelationTypeGroupEnum,
+    toId: string,
+    toType: TbEntityEnum,
+  ) {
+    // /api/relation{?fromId,fromType,relationType,relationTypeGroup,toId,toType}
+  }
+
+  async findRelationByQuery(query: TbRelationsQuery) {
+    /*
+{
+  "filters": [
+    {
+      "relationType": "Contains",
+      "entityTypes": [
+        "ALARM"
+      ]
+    }
+  ],
+  "parameters": {
+    "rootId": "784f394c-42b6-435a-983c-b7beff2784f9",
+    "rootType": "ALARM",
+    "direction": "FROM",
+    "relationTypeGroup": "COMMON",
+    "maxLevel": 0,
+    "fetchLastLevelOnly": false
+  }
+}
+    */
+  }
+
+  async getRelationInfosByFrom() {
+    // /api/relations/info{?fromId,fromType,relationTypeGroup}
+  }
+
+  async getRelationInfosByTo() {
+    // /api/relations/info{?fromId,fromType,relationTypeGroup}
+  }
+
+  async assignDeviceToAsset(
+    deviceName: string,
+    assetName: string,
+  ): Promise<void> {
+    this.logger.info(`Assigning device ${deviceName} to asset ${assetName}`)
+
+    const deviceId = await this.getCachedDeviceId(deviceName)
+    const assetId = await this.getCachedAssetId(assetName)
   }
 }

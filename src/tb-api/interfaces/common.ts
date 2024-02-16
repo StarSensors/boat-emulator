@@ -1,6 +1,6 @@
 import { TbEntityEnum } from './enums'
 
-export type TbEntity = {
+export type TbEntityId = {
   id: string
   entityType: TbEntityEnum
 }

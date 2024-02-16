@@ -1,16 +1,16 @@
-import { TbEntity } from './common'
+import { TbEntityId } from './common'
 
 export type TbAsset = {
-  id?: TbEntity
+  id?: TbEntityId
   createdTime?: number
-  tenantId?: TbEntity
-  customerId?: TbEntity
+  tenantId?: TbEntityId
+  customerId?: TbEntityId
   name: string
   type?: string
   label?: string
-  assetProfileId?: TbEntity
+  assetProfileId?: TbEntityId
   additionalInfo?: any
-  externalId?: TbEntity
+  externalId?: TbEntityId
 }
 
 export type TbAssetInfo = TbAsset & {

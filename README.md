@@ -19,8 +19,12 @@ docker compose up -d
 To recreate a fresh install do:
 
 ```
+docker compose down
 ./scripts/clean-tb-data.sh
+docker compose up -d
 ```
+
+(It takes a while for Thingsboard to fully initiate. Please check the container logs.)
 
 ## Swagger docs
 

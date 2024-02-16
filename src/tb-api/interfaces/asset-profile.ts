@@ -1,19 +1,19 @@
-import { TbEntity } from './common'
+import { TbEntityId } from './common'
 
 export type TbAssetProfileInfo = {
-  id?: TbEntity
+  id?: TbEntityId
   name: string
   image?: string
-  defaultDashboardId?: TbEntity
-  tenantId?: TbEntity
+  defaultDashboardId?: TbEntityId
+  tenantId?: TbEntityId
 }
 
 export type TbAssetProfile = TbAssetProfileInfo & {
   createdTime?: number
   default?: boolean
-  defaultRuleChainId?: TbEntity
+  defaultRuleChainId?: TbEntityId
   defaultQueueName?: string
   description?: string
-  defaultEdgeRuleChainId?: TbEntity
-  externalId?: TbEntity
+  defaultEdgeRuleChainId?: TbEntityId
+  externalId?: TbEntityId
 }

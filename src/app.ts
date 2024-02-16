@@ -145,6 +145,9 @@ const boostrap = async () => {
           // claim device
           await api.claimDevice(name, device.attributes.claimingData.secretKey)
 
+          // update the relation
+          await api.assignDeviceToAsset(name, asset.name)
+
           // set user specific device label
           await api.setDeviceLabel(name, label)
         }
