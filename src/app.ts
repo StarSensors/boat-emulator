@@ -164,7 +164,7 @@ const boostrap = async () => {
     tbGatewayDevice.id?.id || 'unknown',
   )
   // start the gateway
-  tbGateway.start(accessToken)
+  // tbGateway.start(accessToken)
 }
 
 boostrap()

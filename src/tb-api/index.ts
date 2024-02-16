@@ -33,8 +33,8 @@ import { TbDeviceProfile } from './interfaces/device-profile'
 import { TbUser, TbUserActivationLink } from './interfaces/user'
 
 // constants
-import { URI_MAPPING } from './constants'
-import { TbRelationsQuery } from './interfaces/relation'
+import { URI_MAPPING } from './uri-mapping'
+import { TbRelation } from './interfaces/relation'
 
 export class TbApi {
   private readonly clientType: TbClientType
@@ -407,6 +407,16 @@ export class TbApi {
     return response.data
   }
 
+  async getEntity<T>(
+    entityType: TbApiEntity,
+    config: AxiosRequestConfig | undefined = undefined,
+  ): Promise<T | undefined> {
+    const uri = this.getUri(entityType, 'get', 'single', 'byId')
+    this.logger.info(`Fetching entity ${entityType}`)
+    const response: AxiosResponse<T> = await this.api.get<T>(uri, config)
+    return response.data
+  }
+
   async getDevices(): Promise<TbDevice[]> {
     return this.getEntities<TbDevice>('device')
   }
@@ -539,7 +549,7 @@ export class TbApi {
           ...tbAsset,
           assetProfileId: {
             entityType: TbEntityEnum.ASSET_PROFILE,
-            id: tbAssetProfile.id?.id || 'unknown',
+            id: tbAssetProfile.id?.id || 'todo: this can not happen',
           },
         })
       }
@@ -549,7 +559,7 @@ export class TbApi {
         name: name,
         assetProfileId: {
           entityType: TbEntityEnum.ASSET_PROFILE,
-          id: tbAssetProfile.id?.id || 'unknown',
+          id: tbAssetProfile.id?.id || 'todo: this can not happen',
         },
       })
     }
@@ -594,7 +604,7 @@ export class TbApi {
           ...tbDevice,
           deviceProfileId: {
             entityType: TbEntityEnum.DEVICE_PROFILE,
-            id: tbDeviceProfile.id?.id || 'unknown',
+            id: tbDeviceProfile.id?.id || 'todo: this can not happen',
           },
           externalId: {
             entityType: TbEntityEnum.DEVICE,
@@ -610,7 +620,7 @@ export class TbApi {
         name,
         deviceProfileId: {
           entityType: TbEntityEnum.DEVICE_PROFILE,
-          id: tbDeviceProfile.id?.id || 'unknown',
+          id: tbDeviceProfile.id?.id || 'todo: this can not happen',
         },
         externalId: {
           entityType: TbEntityEnum.DEVICE,
@@ -696,7 +706,7 @@ export class TbApi {
           ...tbUser,
           customerId: {
             entityType: TbEntityEnum.CUSTOMER,
-            id: tbCustomer.id?.id || 'unknown',
+            id: tbCustomer.id?.id || 'todo: this can not happen',
           },
           firstName,
           lastName,
@@ -709,7 +719,7 @@ export class TbApi {
         {
           customerId: {
             entityType: TbEntityEnum.CUSTOMER,
-            id: tbCustomer.id?.id || 'unknown',
+            id: tbCustomer.id?.id || 'todo: this can not happen',
           },
           authority: TbAuthorityEnum.CUSTOMER_USER,
           firstName,
@@ -820,73 +830,67 @@ export class TbApi {
     }
   }
 
-  async saveRelation() {
-    /*
-{
-  "from": {
-    "id": "784f394c-42b6-435a-983c-b7beff2784f9",
-    "entityType": "DEVICE"
-  },
-  "to": {
-    "id": "784f394c-42b6-435a-983c-b7beff2784f9",
-    "entityType": "DEVICE"
-  },
-  "type": "Contains",
-  "typeGroup": "COMMON",
-  "additionalInfo": {}
-}
-    */
-  }
-
-  async getRelation(
-    fromId: string,
-    fromType: TbEntityEnum,
-    relationType: string,
-    relationTypeGroup: TbRelationTypeGroupEnum,
-    toId: string,
-    toType: TbEntityEnum,
-  ) {
-    // /api/relation{?fromId,fromType,relationType,relationTypeGroup,toId,toType}
-  }
-
-  async findRelationByQuery(query: TbRelationsQuery) {
-    /*
-{
-  "filters": [
-    {
-      "relationType": "Contains",
-      "entityTypes": [
-        "ALARM"
-      ]
-    }
-  ],
-  "parameters": {
-    "rootId": "784f394c-42b6-435a-983c-b7beff2784f9",
-    "rootType": "ALARM",
-    "direction": "FROM",
-    "relationTypeGroup": "COMMON",
-    "maxLevel": 0,
-    "fetchLastLevelOnly": false
-  }
-}
-    */
-  }
-
-  async getRelationInfosByFrom() {
-    // /api/relations/info{?fromId,fromType,relationTypeGroup}
-  }
-
-  async getRelationInfosByTo() {
-    // /api/relations/info{?fromId,fromType,relationTypeGroup}
-  }
-
   async assignDeviceToAsset(
     deviceName: string,
     assetName: string,
-  ): Promise<void> {
+  ): Promise<TbRelation> {
     this.logger.info(`Assigning device ${deviceName} to asset ${assetName}`)
 
-    const deviceId = await this.getCachedDeviceId(deviceName)
-    const assetId = await this.getCachedAssetId(assetName)
+    const tbDevices = await this.getEntities<TbDevice>('device')
+    const tbDevice = _.find(tbDevices, { name: deviceName }) as TbDevice
+    if (!tbDevice) {
+      throw new Error(`Device ${deviceName}: Not found in device list`)
+    }
+
+    const tbAssets = await this.getEntities<TbAsset>('asset')
+    const tbAsset = _.find(tbAssets, { name: assetName }) as TbAsset
+    if (!tbAsset) {
+      throw new Error(`Asset ${assetName}: Not found in asset list`)
+    }
+
+    let tbRelation
+    try {
+      tbRelation = await this.getEntity<TbRelation>('relation', {
+        params: {
+          fromId: tbAsset.id?.id,
+          fromType: TbEntityEnum.ASSET,
+          toId: tbDevice.id?.id,
+          toType: TbEntityEnum.DEVICE,
+          relationType: 'Contains',
+          relationTypeGroup: TbRelationTypeGroupEnum.COMMON,
+        },
+      })
+    } catch (error) {
+      if (isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          this.logger.info(
+            `Relation asset ${assetName} → device ${deviceName}: Does not exist yet`,
+          )
+        }
+      } else {
+        throw error
+      }
+    }
+
+    if (tbRelation) {
+      this.logger.warn(
+        `Relation asset ${assetName} → device ${deviceName}: Already exists`,
+      )
+      return tbRelation
+    }
+
+    return await this.upsertEntity<TbRelation>('relation', {
+      from: {
+        id: tbAsset.id?.id || 'todo: this can not happen',
+        entityType: TbEntityEnum.ASSET,
+      },
+      to: {
+        id: tbDevice.id?.id || 'todo: this can not happen',
+        entityType: TbEntityEnum.DEVICE,
+      },
+      type: 'Contains',
+      typeGroup: TbRelationTypeGroupEnum.COMMON,
+      additionalInfo: {},
+    })
   }
 }

@@ -6,6 +6,7 @@ export type TbApiEntity =
   | 'customer'
   | 'device'
   | 'device-profile'
+  | 'relation'
   | 'user'
 
 export type TbApiOptions = {
