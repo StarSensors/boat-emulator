@@ -71,13 +71,13 @@ export const URI_MAPPING: Record<
       get: {
         single: {
           byId: 'not-allowed',
-          byName: 'not-allowed',
+          byName: 'not-available',
         },
         many: 'not-allowed',
       },
       post: {
         single: 'not-allowed',
-        many: 'not-implemented',
+        many: 'not-available',
       },
     },
     tenant: {
@@ -90,7 +90,35 @@ export const URI_MAPPING: Record<
       },
       post: {
         single: 'api/customer',
-        many: 'not-implemented',
+        many: 'not-available',
+      },
+    },
+  },
+  dashboard: {
+    customer: {
+      get: {
+        single: {
+          byId: 'not-implemented', // api/dashboard/{entityId}
+          byName: 'not-available',
+        },
+        many: 'not-allowed',
+      },
+      post: {
+        single: 'not-allowed',
+        many: 'not-allowed',
+      },
+    },
+    tenant: {
+      get: {
+        single: {
+          byId: 'api/dashboard/{entityId}', // api/dashboard/{entityId}
+          byName: 'not-available',
+        },
+        many: 'api/tenant/dashboards', // page
+      },
+      post: {
+        single: 'api/dashboard',
+        many: 'not-allowed',
       },
     },
   },

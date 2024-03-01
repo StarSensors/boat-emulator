@@ -17,24 +17,25 @@ import { TbClientType, TbApiEntity } from './types'
 import { TbPageData } from './models/page-data'
 
 // interfaces
-import { TbDevice, TbDeviceInfo } from './interfaces/device'
 import {
+  TbAuthorityEnum,
+  TbEntityEnum,
+  TbProvisionTypeEnum,
+  TbRelationTypeGroupEnum,
   TbScopeEnum,
   TbTransportEnum,
-  TbProvisionTypeEnum,
-  TbEntityEnum,
-  TbAuthorityEnum,
-  TbRelationTypeGroupEnum,
 } from './interfaces/enums'
 import { TbAsset } from './interfaces/asset'
 import { TbAssetProfile } from './interfaces/asset-profile'
 import { TbCustomer } from './interfaces/customer'
+import { TbDashboard, TbDashboardInfo } from './interfaces/dashboard'
+import { TbDevice, TbDeviceInfo } from './interfaces/device'
 import { TbDeviceProfile } from './interfaces/device-profile'
+import { TbRelation } from './interfaces/relation'
 import { TbUser, TbUserActivationLink } from './interfaces/user'
 
 // constants
 import { URI_MAPPING } from './uri-mapping'
-import { TbRelation } from './interfaces/relation'
 
 export class TbApi {
   private readonly clientType: TbClientType
@@ -316,6 +317,7 @@ export class TbApi {
     method: 'get' | 'post',
     pluralType: 'single' | 'many',
     byType?: 'byId' | 'byName',
+    entityId?: string,
   ) {
     let uri
     if (method === 'get' && pluralType === 'single' && byType) {
@@ -327,8 +329,6 @@ export class TbApi {
         pluralType
       ] as string
     }
-
-    uri = uri.replace('{customerId}', this.customerId || '')
 
     if (!uri) {
       throw new Error(`Entity type ${entityType} not supported`)
@@ -343,6 +343,17 @@ export class TbApi {
         `Entity type ${entityType} ${method} ${pluralType} not implemented for ${this.clientType} client type`,
       )
     }
+
+    uri = uri.replace('{customerId}', this.customerId || '')
+
+    if (entityId) {
+      uri = uri.replace('{entityId}', entityId)
+    }
+
+    this.logger.debug(
+      `URI for ${entityType}.${this.clientType}.${method}.${pluralType}${byType ? '.' + byType : ''}: ${uri}`,
+    )
+
     return uri
   }
 
@@ -399,6 +410,9 @@ export class TbApi {
   ): Promise<T> {
     const uri = this.getUri(entityType, 'post', 'single')
     this.logger.info(`Upserting entity ${entityType}`)
+    this.logger.debug(
+      `Posting entity ${entityType}: ${JSON.stringify(entity)}, uri: ${uri}`,
+    )
     const response: AxiosResponse<T> = await this.api.post<T>(
       uri,
       entity,
@@ -410,8 +424,9 @@ export class TbApi {
   async getEntity<T>(
     entityType: TbApiEntity,
     config: AxiosRequestConfig | undefined = undefined,
+    entityId?: string,
   ): Promise<T | undefined> {
-    const uri = this.getUri(entityType, 'get', 'single', 'byId')
+    const uri = this.getUri(entityType, 'get', 'single', 'byId', entityId)
     this.logger.info(`Fetching entity ${entityType}`)
     const response: AxiosResponse<T> = await this.api.get<T>(uri, config)
     return response.data
@@ -735,6 +750,51 @@ export class TbApi {
     }
 
     return tbUser
+  }
+
+  async upsertDashboard(dashboard: any): Promise<TbDashboardInfo> {
+    const tbDashboardInfos =
+      await this.getEntities<TbDashboardInfo>('dashboard')
+    const tbDashboardInfo = _.find(tbDashboardInfos, { title: dashboard.title })
+
+    if (tbDashboardInfo) {
+      const tbDashboard = await this.getEntity<TbDashboard>(
+        'dashboard',
+        {
+          params: { inlineImages: true },
+        },
+        tbDashboardInfo.id?.id,
+      )
+
+      const dashboardConfiguration = dashboard.configuration
+      const currentConfiguration = tbDashboard?.configuration
+
+      if (_.isEqual(dashboardConfiguration, currentConfiguration)) {
+        this.logger.info(`Dashboard ${dashboard.title}: In sync`)
+        return tbDashboardInfo
+      } else {
+        this.logger.info(`Dashboard ${dashboard.title}: Updating configuration`)
+        return await this.upsertEntity<TbDashboard>('dashboard', {
+          ...tbDashboardInfo,
+          configuration: dashboardConfiguration,
+        })
+      }
+    }
+
+    this.logger.info(`Dashboard ${dashboard.title}: Creating new dashboard.`)
+    return await this.upsertEntity<TbDashboardInfo>('dashboard', dashboard)
+  }
+
+  async assignDashboardToCustomer(dashboardId: string, customerTitle: string) {
+    this.logger.info(
+      `Assigning dashboard ${dashboardId} to customer ${customerTitle}`,
+    )
+
+    const customerId = await this.getCachedCustomerId(customerTitle)
+
+    return await this.api.post<TbDashboard>(
+      `/api/customer/${customerId}/dashboard/${dashboardId}`,
+    )
   }
 
   async activateUser(email: string, password: string): Promise<void> {

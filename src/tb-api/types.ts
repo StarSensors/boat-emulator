@@ -4,6 +4,7 @@ export type TbApiEntity =
   | 'asset'
   | 'asset-profile'
   | 'customer'
+  | 'dashboard'
   | 'device'
   | 'device-profile'
   | 'relation'

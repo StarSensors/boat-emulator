@@ -2,14 +2,15 @@ import { connect, IClientOptions, MqttClient } from 'mqtt'
 import { Logger } from 'pino'
 import { hostname } from 'os'
 import * as _ from 'lodash'
-// import { inspect } from 'util'
+import { inspect } from 'util'
 
 import {
-  AttributesMsg,
   // AttributesMsg,
   // ResponseMsg,
   // TelemetryMsg,
   ConnectMsg,
+  RpcRequestMsg,
+  RpcResponseMsg,
   TelemetryMsg,
   // Metric,
   // Device,
@@ -23,6 +24,8 @@ const CONNECT_TOPIC = 'v1/gateway/connect'
 const ATTRIBUTES_TOPIC = 'v1/gateway/attributes'
 const REQUEST_TOPIC = 'v1/gateway/attributes/request'
 const RESPONSE_TOPIC = 'v1/gateway/attributes/response'
+const TELEMETRY_TOPIC = 'v1/gateway/telemetry'
+const RPC_TOPIC = 'v1/gateway/rpc'
 
 export class TbGateway {
   private logger: Logger
@@ -108,10 +111,107 @@ export class TbGateway {
       this.publishTelemetry()
       this.setNewState()
     }, 5000)
+    // }, 500)
   }
 
   private onMessage(topic: string, message: Buffer) {
     console.log('Received message', topic, message.toString())
+    switch (topic) {
+      case RPC_TOPIC:
+        this.handleRpcMessage(message)
+        break
+      default:
+        break
+    }
+  }
+
+  private handleRpcMessage(message: Buffer) {
+    const request: RpcRequestMsg = JSON.parse(message.toString())
+    this.logger.info(`Received RPC message ${JSON.stringify(request)}`)
+
+    switch (request.data.method) {
+      case 'getTarget':
+        this.handleRpcGetTarget(request)
+        break
+      case 'setTarget':
+        this.handleRpcSetTarget(request)
+        break
+      default:
+        this.logger.error(`Device ${request.device}: Unknown method`)
+        break
+    }
+  }
+
+  private handleRpcGetTarget(request: RpcRequestMsg) {
+    const state = this.state[request.device]
+
+    if (!state) {
+      this.logger.error(`Device ${request.device} not found in state`)
+      return
+    }
+
+    let metric: string = 'temperature'
+    if (request.device.startsWith('Battery')) {
+      metric = 'battery_voltage'
+    }
+
+    const target = state.target?.[metric]
+    const current = state.current[metric]
+    let data: number
+
+    if (typeof current === 'undefined' || current === null) {
+      this.logger.error(`Current value for ${metric} is not defined`)
+      return
+    }
+
+    data = current
+    if (typeof target !== 'undefined' && target !== null) {
+      data = target
+    }
+
+    const response: RpcResponseMsg = {
+      device: request.device,
+      id: request.data.id,
+      data,
+    }
+
+    this.client.publish(RPC_TOPIC, JSON.stringify(response))
+  }
+
+  private handleRpcSetTarget(request: RpcRequestMsg) {
+    const state = this.state[request.device]
+
+    if (!state) {
+      this.logger.error(`Device ${request.device} not found in state`)
+      return
+    }
+
+    if (!state.target) {
+      state.target = {}
+    }
+
+    let metric: string = 'temperature'
+    if (request.device.startsWith('Battery')) {
+      metric = 'battery_voltage'
+    }
+
+    const target: { [key: string]: number } = {
+      [metric]: request.data.params,
+    }
+
+    state.target = { ...state.target, ...target }
+
+    this.logger.info(
+      `Device ${request.device}: Setting ${metric} to ${request.data.params}`,
+    )
+
+    const response: RpcResponseMsg = {
+      device: request.device,
+      id: request.data.id,
+      data: request.data.params,
+    }
+
+    this.client.publish(RPC_TOPIC, JSON.stringify(response))
   }
 
   private publishTelemetry() {
@@ -129,7 +229,7 @@ export class TbGateway {
     )
     const telemetryMsgString = JSON.stringify(telemetryMsg)
     this.logger.info('Sending telemetry message')
-    this.client.publish('v1/gateway/telemetry', telemetryMsgString)
+    this.client.publish(TELEMETRY_TOPIC, telemetryMsgString)
   }
 
   private setNewState() {
@@ -137,11 +237,14 @@ export class TbGateway {
       device.previous = device.current
       device.current = _.mapValues(device.current, (value, metric) => {
         const behavior = metricBehaviors[metric as keyof typeof metricBehaviors]
+
         if (!behavior) {
           throw new Error(`No behavior found for metric ${metric}`)
         }
 
-        return this.getNewStateValue(value, metric, behavior)
+        const target = device.target?.[metric]
+
+        return this.getNewStateValue(value, metric, behavior, target)
       })
     })
   }
@@ -150,6 +253,7 @@ export class TbGateway {
     value: number,
     metric: string,
     behavior: { step: number; min: number; max: number },
+    target?: number,
   ): number {
     switch (metric) {
       case 'battery_level':
@@ -162,7 +266,7 @@ export class TbGateway {
       case 'sensor_battery_voltage':
       case 'temperature':
       case 'water':
-        return this.getNewValueGeneric(value, behavior)
+        return this.getNewValueGeneric(value, behavior, target)
       default:
         throw new Error(`No behavior found for metric ${metric}`)
     }
@@ -171,6 +275,7 @@ export class TbGateway {
   private getNewValueGeneric(
     value: number,
     behavior: { step: number; min: number; max: number; trend?: string },
+    target?: number,
   ): number {
     let random = _.random(-1, 1)
     if (behavior.trend === 'up') {
@@ -178,6 +283,15 @@ export class TbGateway {
     } else if (behavior.trend === 'down') {
       random = _.random(-1, 0)
     }
+
+    if (target) {
+      if (value < target) {
+        random = _.random(0, 10)
+      } else if (value > target) {
+        random = _.random(-10, 0)
+      }
+    }
+
     const delta = random * behavior.step
     const newValue = value + delta
 

@@ -29,6 +29,21 @@ export type ResponseMsg = {
   value: string
 }
 
+export type RpcRequestMsg = {
+  device: string
+  data: {
+    id: number
+    method: string
+    params: any | null
+  }
+}
+
+export type RpcResponseMsg = {
+  device: string
+  id: number
+  data: any
+}
+
 export type Metric =
   | 'battery_level'
   | 'battery_voltage'
