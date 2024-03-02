@@ -114,7 +114,7 @@
             "rowClick": [],
             "actionCellButton": [
               {
-                "name": "${entityName}",
+                "name": "Battery details and taget settings",
                 "icon": "tune",
                 "useShowWidgetActionFunction": null,
                 "showWidgetActionFunction": "return true;",
@@ -1105,13 +1105,45 @@
                   "type": "timeseries",
                   "label": "Voltage - ${entityName}",
                   "color": "#2196f3",
-                  "settings": {},
+                  "settings": {
+                    "hideDataByDefault": false,
+                    "disableDataHiding": false,
+                    "removeFromLegend": false,
+                    "excludeFromStacking": false,
+                    "showLines": true,
+                    "lineWidth": 1,
+                    "fillLines": false,
+                    "showPoints": false,
+                    "tooltipValueFormatter": "",
+                    "showSeparateAxis": false,
+                    "axisTitle": "",
+                    "axisMin": null,
+                    "axisMax": null,
+                    "axisPosition": "left",
+                    "axisTickSize": null,
+                    "axisTickDecimals": null,
+                    "axisTicksFormatter": "",
+                    "comparisonSettings": {
+                      "showValuesForComparison": true,
+                      "comparisonValuesLabel": "",
+                      "color": ""
+                    },
+                    "thresholds": [
+                      {
+                        "thresholdValueSource": "entityAttribute",
+                        "thresholdEntityAlias": "Selected battery",
+                        "thresholdAttribute": "target",
+                        "lineWidth": null,
+                        "color": "#F44336"
+                      }
+                    ]
+                  },
                   "_hash": 0.12604885785359188,
                   "units": "V",
                   "decimals": 3,
                   "aggregationType": null,
                   "funcBody": null,
-                  "usePostProcessing": null,
+                  "usePostProcessing": false,
                   "postFuncBody": null
                 }
               ],
@@ -1132,12 +1164,14 @@
           "padding": "8px",
           "settings": {
             "stack": false,
+            "enableSelection": true,
             "fontSize": 10,
             "fontColor": "#545454",
             "showTooltip": true,
             "tooltipIndividual": false,
             "tooltipCumulative": false,
             "hideZeros": false,
+            "tooltipValueFormatter": "",
             "grid": {
               "verticalLines": true,
               "horizontalLines": true,
@@ -1152,8 +1186,8 @@
               "color": "#545454"
             },
             "yaxis": {
-              "min": null,
-              "max": null,
+              "min": 8,
+              "max": 16,
               "title": null,
               "showLabels": true,
               "color": "#545454",
@@ -1163,12 +1197,8 @@
             },
             "shadowSize": 4,
             "smoothLines": false,
+            "thresholdsLineWidth": null,
             "comparisonEnabled": false,
-            "xaxisSecond": {
-              "axisPosition": "top",
-              "title": null,
-              "showLabels": true
-            },
             "showLegend": true,
             "legendConfig": {
               "direction": "column",
@@ -1376,6 +1406,89 @@
         "row": 0,
         "col": 0,
         "id": "93d816a5-5705-0727-2130-467cb112bda6"
+      },
+      "95a18b78-b271-0d3e-2b5f-5d9ed2cc8ce7": {
+        "typeFullFqn": "system.cards.attributes_card",
+        "type": "latest",
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": "",
+              "entityAliasId": "832c2c7d-e099-2e08-4d76-1f0e4442ed7a",
+              "dataKeys": [
+                {
+                  "name": "target_enabled",
+                  "type": "attribute",
+                  "label": "Target enabled",
+                  "color": "#4caf50",
+                  "settings": {},
+                  "_hash": 0.5680278340092402,
+                  "aggregationType": null,
+                  "units": null,
+                  "decimals": null,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                },
+                {
+                  "name": "target",
+                  "type": "attribute",
+                  "label": "Target",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.5321184889387267,
+                  "aggregationType": null,
+                  "units": "V",
+                  "decimals": 3,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                }
+              ],
+              "alarmFilterConfig": {
+                "statusList": ["ACTIVE"]
+              }
+            }
+          ],
+          "timewindow": {
+            "displayValue": "",
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 1,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "quickInterval": "CURRENT_DAY"
+            },
+            "history": {
+              "historyType": 0,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "fixedTimewindow": {
+                "startTimeMs": 1709289155445,
+                "endTimeMs": 1709375555445
+              },
+              "quickInterval": "CURRENT_DAY"
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {},
+          "title": "Attributes card",
+          "useDashboardTimewindow": true,
+          "displayTimewindow": true
+        },
+        "row": 0,
+        "col": 0,
+        "id": "95a18b78-b271-0d3e-2b5f-5d9ed2cc8ce7"
       }
     },
     "states": {
@@ -1467,6 +1580,12 @@
                 "sizeY": 4,
                 "row": 0,
                 "col": 8
+              },
+              "95a18b78-b271-0d3e-2b5f-5d9ed2cc8ce7": {
+                "sizeX": 4,
+                "sizeY": 3,
+                "row": 0,
+                "col": 11
               }
             },
             "gridSettings": {
