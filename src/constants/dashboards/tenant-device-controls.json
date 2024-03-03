@@ -1441,7 +1441,39 @@
                   "type": "timeseries",
                   "label": "temperature",
                   "color": "#2196f3",
-                  "settings": {},
+                  "settings": {
+                    "hideDataByDefault": false,
+                    "disableDataHiding": false,
+                    "removeFromLegend": false,
+                    "excludeFromStacking": false,
+                    "showLines": true,
+                    "lineWidth": 1,
+                    "fillLines": false,
+                    "showPoints": false,
+                    "tooltipValueFormatter": "",
+                    "showSeparateAxis": false,
+                    "axisTitle": "",
+                    "axisMin": null,
+                    "axisMax": null,
+                    "axisPosition": "left",
+                    "axisTickSize": null,
+                    "axisTickDecimals": null,
+                    "axisTicksFormatter": "",
+                    "comparisonSettings": {
+                      "showValuesForComparison": true,
+                      "comparisonValuesLabel": "",
+                      "color": ""
+                    },
+                    "thresholds": [
+                      {
+                        "thresholdValueSource": "entityAttribute",
+                        "thresholdEntityAlias": "Selected environment sensor",
+                        "thresholdAttribute": "target_temperature",
+                        "lineWidth": null,
+                        "color": "#F44336"
+                      }
+                    ]
+                  },
                   "_hash": 0.8361316629230522,
                   "aggregationType": null,
                   "units": "°C",
@@ -1693,7 +1725,7 @@
                   "color": "#f44336",
                   "settings": {
                     "dataKeyHidden": false,
-                    "dataKeyType": "server",
+                    "dataKeyType": "shared",
                     "dataKeyValueType": "double",
                     "required": false,
                     "isEditable": "editable",
