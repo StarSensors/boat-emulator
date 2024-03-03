@@ -1,5 +1,5 @@
 {
-  "title": "Admin device controls",
+  "title": "Tenant device controls",
   "image": null,
   "mobileHide": false,
   "mobileOrder": null,
@@ -1234,9 +1234,9 @@
               "sortDataKeys": false,
               "showMin": false,
               "showMax": false,
-              "showAvg": true,
+              "showAvg": false,
               "showTotal": false,
-              "showLatest": false
+              "showLatest": true
             },
             "customLegendEnabled": false
           },
@@ -1281,7 +1281,7 @@
                 {
                   "name": "target_enabled",
                   "type": "attribute",
-                  "label": "Enabled",
+                  "label": "Target enabled",
                   "color": "#f44336",
                   "settings": {
                     "dataKeyHidden": false,
@@ -1324,7 +1324,7 @@
                 {
                   "name": "target_battery_voltage",
                   "type": "attribute",
-                  "label": "Battery voltage",
+                  "label": "Target battery voltage",
                   "color": "#4caf50",
                   "settings": {
                     "dataKeyHidden": false,
@@ -1438,7 +1438,7 @@
     },
     "states": {
       "default": {
-        "name": "Admin device controls",
+        "name": "Tenant device controls",
         "root": true,
         "layouts": {
           "main": {
@@ -1628,5 +1628,5 @@
       "toolbarAlwaysOpen": true
     }
   },
-  "name": "Admin device controls"
+  "name": "Tenant device controls"
 }
