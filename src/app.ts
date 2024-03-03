@@ -9,6 +9,7 @@ import { TbGateway } from './tb-gateway'
 import { assetProfiles } from './constants/asset-profiles'
 import { assets } from './constants/assets'
 import { customers } from './constants/customers'
+import { dashboardMap } from './constants/dashboards'
 import { deviceProfiles } from './constants/device-profiles'
 import { devices } from './constants/devices'
 import { users } from './constants/users'
@@ -110,6 +111,22 @@ const boostrap = async () => {
     }
   }
 
+  // setup user dashboards
+  for (const dashboardUser in dashboardMap) {
+    const dashboards: any[] = dashboardMap[dashboardUser] || []
+    for (const dashboard of dashboards) {
+      const db = await tenantApi.upsertDashboard(dashboard)
+      if (dashboardUser === 'customer') {
+        for (const customer of customers) {
+          await tenantApi.assignDashboardToCustomer(
+            db.id?.id || 'unknown',
+            customer.title,
+          )
+        }
+      }
+    }
+  }
+
   // user apis
   const userApis = _.map(users, user => ({
     ...user,
@@ -145,6 +162,9 @@ const boostrap = async () => {
           // claim device
           await api.claimDevice(name, device.attributes.claimingData.secretKey)
 
+          // update the relation
+          await api.assignDeviceToAsset(name, asset.name)
+
           // set user specific device label
           await api.setDeviceLabel(name, label)
         }
@@ -156,11 +176,12 @@ const boostrap = async () => {
   const tbGatewayDevice = await tenantApi.upsertGatewayDevice(
     'Boat Emulator Gateway',
   )
+
+  // start the gateway
   const accessToken = await tenantApi.getCachedDeviceAccessToken(
     tbGatewayDevice.name,
     tbGatewayDevice.id?.id || 'unknown',
   )
-  // start the gateway
   tbGateway.start(accessToken)
 }
 

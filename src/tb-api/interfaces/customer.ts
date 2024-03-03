@@ -1,9 +1,9 @@
-import { TbEntity } from './common'
+import { TbEntityId } from './common'
 
 export type TbCustomer = {
-  id?: TbEntity
+  id?: TbEntityId
   title: string
-  tenantId?: TbEntity
+  tenantId?: TbEntityId
   country?: string
   state?: string
   city?: string

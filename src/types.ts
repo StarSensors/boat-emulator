@@ -16,6 +16,14 @@ export type AttributesMsg = {
     [key: string]: number | string
   }
 }
+
+export type SharedAttributesMsg = {
+  device: string
+  data: {
+    [key: string]: number | string | boolean
+  }
+}
+
 export type RequestMsg = {
   id: string
   device: string
@@ -27,6 +35,21 @@ export type ResponseMsg = {
   id: string
   device: string
   value: string
+}
+
+export type RpcRequestMsg = {
+  device: string
+  data: {
+    id: number
+    method: string
+    params: any | null
+  }
+}
+
+export type RpcResponseMsg = {
+  device: string
+  id: number
+  data: any
 }
 
 export type Metric =

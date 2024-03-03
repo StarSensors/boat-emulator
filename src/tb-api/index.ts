@@ -17,22 +17,25 @@ import { TbClientType, TbApiEntity } from './types'
 import { TbPageData } from './models/page-data'
 
 // interfaces
-import { TbDevice, TbDeviceInfo } from './interfaces/device'
 import {
+  TbAuthorityEnum,
+  TbEntityEnum,
+  TbProvisionTypeEnum,
+  TbRelationTypeGroupEnum,
   TbScopeEnum,
   TbTransportEnum,
-  TbProvisionTypeEnum,
-  TbEntityEnum,
-  TbAuthorityEnum,
 } from './interfaces/enums'
 import { TbAsset } from './interfaces/asset'
 import { TbAssetProfile } from './interfaces/asset-profile'
 import { TbCustomer } from './interfaces/customer'
+import { TbDashboard, TbDashboardInfo } from './interfaces/dashboard'
+import { TbDevice, TbDeviceInfo } from './interfaces/device'
 import { TbDeviceProfile } from './interfaces/device-profile'
+import { TbRelation } from './interfaces/relation'
 import { TbUser, TbUserActivationLink } from './interfaces/user'
 
 // constants
-import { URI_MAPPING } from './constants'
+import { URI_MAPPING } from './uri-mapping'
 
 export class TbApi {
   private readonly clientType: TbClientType
@@ -314,6 +317,7 @@ export class TbApi {
     method: 'get' | 'post',
     pluralType: 'single' | 'many',
     byType?: 'byId' | 'byName',
+    entityId?: string,
   ) {
     let uri
     if (method === 'get' && pluralType === 'single' && byType) {
@@ -325,8 +329,6 @@ export class TbApi {
         pluralType
       ] as string
     }
-
-    uri = uri.replace('{customerId}', this.customerId || '')
 
     if (!uri) {
       throw new Error(`Entity type ${entityType} not supported`)
@@ -341,6 +343,17 @@ export class TbApi {
         `Entity type ${entityType} ${method} ${pluralType} not implemented for ${this.clientType} client type`,
       )
     }
+
+    uri = uri.replace('{customerId}', this.customerId || '')
+
+    if (entityId) {
+      uri = uri.replace('{entityId}', entityId)
+    }
+
+    this.logger.debug(
+      `URI for ${entityType}.${this.clientType}.${method}.${pluralType}${byType ? '.' + byType : ''}: ${uri}`,
+    )
+
     return uri
   }
 
@@ -397,11 +410,25 @@ export class TbApi {
   ): Promise<T> {
     const uri = this.getUri(entityType, 'post', 'single')
     this.logger.info(`Upserting entity ${entityType}`)
+    this.logger.debug(
+      `Posting entity ${entityType}: ${JSON.stringify(entity)}, uri: ${uri}`,
+    )
     const response: AxiosResponse<T> = await this.api.post<T>(
       uri,
       entity,
       config,
     )
+    return response.data
+  }
+
+  async getEntity<T>(
+    entityType: TbApiEntity,
+    config: AxiosRequestConfig | undefined = undefined,
+    entityId?: string,
+  ): Promise<T | undefined> {
+    const uri = this.getUri(entityType, 'get', 'single', 'byId', entityId)
+    this.logger.info(`Fetching entity ${entityType}`)
+    const response: AxiosResponse<T> = await this.api.get<T>(uri, config)
     return response.data
   }
 
@@ -537,7 +564,7 @@ export class TbApi {
           ...tbAsset,
           assetProfileId: {
             entityType: TbEntityEnum.ASSET_PROFILE,
-            id: tbAssetProfile.id?.id || 'unknown',
+            id: tbAssetProfile.id?.id || 'todo: this can not happen',
           },
         })
       }
@@ -547,7 +574,7 @@ export class TbApi {
         name: name,
         assetProfileId: {
           entityType: TbEntityEnum.ASSET_PROFILE,
-          id: tbAssetProfile.id?.id || 'unknown',
+          id: tbAssetProfile.id?.id || 'todo: this can not happen',
         },
       })
     }
@@ -592,7 +619,7 @@ export class TbApi {
           ...tbDevice,
           deviceProfileId: {
             entityType: TbEntityEnum.DEVICE_PROFILE,
-            id: tbDeviceProfile.id?.id || 'unknown',
+            id: tbDeviceProfile.id?.id || 'todo: this can not happen',
           },
           externalId: {
             entityType: TbEntityEnum.DEVICE,
@@ -608,7 +635,7 @@ export class TbApi {
         name,
         deviceProfileId: {
           entityType: TbEntityEnum.DEVICE_PROFILE,
-          id: tbDeviceProfile.id?.id || 'unknown',
+          id: tbDeviceProfile.id?.id || 'todo: this can not happen',
         },
         externalId: {
           entityType: TbEntityEnum.DEVICE,
@@ -694,7 +721,7 @@ export class TbApi {
           ...tbUser,
           customerId: {
             entityType: TbEntityEnum.CUSTOMER,
-            id: tbCustomer.id?.id || 'unknown',
+            id: tbCustomer.id?.id || 'todo: this can not happen',
           },
           firstName,
           lastName,
@@ -707,7 +734,7 @@ export class TbApi {
         {
           customerId: {
             entityType: TbEntityEnum.CUSTOMER,
-            id: tbCustomer.id?.id || 'unknown',
+            id: tbCustomer.id?.id || 'todo: this can not happen',
           },
           authority: TbAuthorityEnum.CUSTOMER_USER,
           firstName,
@@ -723,6 +750,51 @@ export class TbApi {
     }
 
     return tbUser
+  }
+
+  async upsertDashboard(dashboard: any): Promise<TbDashboardInfo> {
+    const tbDashboardInfos =
+      await this.getEntities<TbDashboardInfo>('dashboard')
+    const tbDashboardInfo = _.find(tbDashboardInfos, { title: dashboard.title })
+
+    if (tbDashboardInfo) {
+      const tbDashboard = await this.getEntity<TbDashboard>(
+        'dashboard',
+        {
+          params: { inlineImages: true },
+        },
+        tbDashboardInfo.id?.id,
+      )
+
+      const dashboardConfiguration = dashboard.configuration
+      const currentConfiguration = tbDashboard?.configuration
+
+      if (_.isEqual(dashboardConfiguration, currentConfiguration)) {
+        this.logger.info(`Dashboard ${dashboard.title}: In sync`)
+        return tbDashboardInfo
+      } else {
+        this.logger.info(`Dashboard ${dashboard.title}: Updating configuration`)
+        return await this.upsertEntity<TbDashboard>('dashboard', {
+          ...tbDashboardInfo,
+          configuration: dashboardConfiguration,
+        })
+      }
+    }
+
+    this.logger.info(`Dashboard ${dashboard.title}: Creating new dashboard.`)
+    return await this.upsertEntity<TbDashboardInfo>('dashboard', dashboard)
+  }
+
+  async assignDashboardToCustomer(dashboardId: string, customerTitle: string) {
+    this.logger.info(
+      `Assigning dashboard ${dashboardId} to customer ${customerTitle}`,
+    )
+
+    const customerId = await this.getCachedCustomerId(customerTitle)
+
+    return await this.api.post<TbDashboard>(
+      `/api/customer/${customerId}/dashboard/${dashboardId}`,
+    )
   }
 
   async activateUser(email: string, password: string): Promise<void> {
@@ -816,5 +888,69 @@ export class TbApi {
         throw error
       }
     }
+  }
+
+  async assignDeviceToAsset(
+    deviceName: string,
+    assetName: string,
+  ): Promise<TbRelation> {
+    this.logger.info(`Assigning device ${deviceName} to asset ${assetName}`)
+
+    const tbDevices = await this.getEntities<TbDevice>('device')
+    const tbDevice = _.find(tbDevices, { name: deviceName }) as TbDevice
+    if (!tbDevice) {
+      throw new Error(`Device ${deviceName}: Not found in device list`)
+    }
+
+    const tbAssets = await this.getEntities<TbAsset>('asset')
+    const tbAsset = _.find(tbAssets, { name: assetName }) as TbAsset
+    if (!tbAsset) {
+      throw new Error(`Asset ${assetName}: Not found in asset list`)
+    }
+
+    let tbRelation
+    try {
+      tbRelation = await this.getEntity<TbRelation>('relation', {
+        params: {
+          fromId: tbAsset.id?.id,
+          fromType: TbEntityEnum.ASSET,
+          toId: tbDevice.id?.id,
+          toType: TbEntityEnum.DEVICE,
+          relationType: 'Contains',
+          relationTypeGroup: TbRelationTypeGroupEnum.COMMON,
+        },
+      })
+    } catch (error) {
+      if (isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          this.logger.info(
+            `Relation asset ${assetName} → device ${deviceName}: Does not exist yet`,
+          )
+        }
+      } else {
+        throw error
+      }
+    }
+
+    if (tbRelation) {
+      this.logger.warn(
+        `Relation asset ${assetName} → device ${deviceName}: Already exists`,
+      )
+      return tbRelation
+    }
+
+    return await this.upsertEntity<TbRelation>('relation', {
+      from: {
+        id: tbAsset.id?.id || 'todo: this can not happen',
+        entityType: TbEntityEnum.ASSET,
+      },
+      to: {
+        id: tbDevice.id?.id || 'todo: this can not happen',
+        entityType: TbEntityEnum.DEVICE,
+      },
+      type: 'Contains',
+      typeGroup: TbRelationTypeGroupEnum.COMMON,
+      additionalInfo: {},
+    })
   }
 }
