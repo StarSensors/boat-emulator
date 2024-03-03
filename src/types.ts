@@ -16,6 +16,14 @@ export type AttributesMsg = {
     [key: string]: number | string
   }
 }
+
+export type SharedAttributesMsg = {
+  device: string
+  data: {
+    [key: string]: number | string | boolean
+  }
+}
+
 export type RequestMsg = {
   id: string
   device: string

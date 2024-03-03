@@ -101,6 +101,34 @@
                   "_hash": 0.23708755350560917,
                   "units": "V",
                   "decimals": 2
+                },
+                {
+                  "name": "target_enabled",
+                  "type": "attribute",
+                  "label": "Target",
+                  "color": "#ffc107",
+                  "settings": {},
+                  "_hash": 0.5343264464687241,
+                  "aggregationType": null,
+                  "units": null,
+                  "decimals": null,
+                  "funcBody": null,
+                  "usePostProcessing": true,
+                  "postFuncBody": "var text = 'Off'\nif (value) {\n    text = 'On'\n}\n\nreturn text;"
+                },
+                {
+                  "name": "target_battery_voltage",
+                  "type": "attribute",
+                  "label": "Target voltage",
+                  "color": "#607d8b",
+                  "settings": {},
+                  "_hash": 0.9770750303037647,
+                  "aggregationType": null,
+                  "units": "V",
+                  "decimals": 2,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
                 }
               ],
               "alarmFilterConfig": {
@@ -1132,7 +1160,7 @@
                       {
                         "thresholdValueSource": "entityAttribute",
                         "thresholdEntityAlias": "Selected battery",
-                        "thresholdAttribute": "target",
+                        "thresholdAttribute": "target_battery_voltage",
                         "lineWidth": null,
                         "color": "#F44336"
                       }
@@ -1257,7 +1285,7 @@
                   "color": "#f44336",
                   "settings": {
                     "dataKeyHidden": false,
-                    "dataKeyType": "server",
+                    "dataKeyType": "shared",
                     "dataKeyValueType": "booleanSwitch",
                     "required": false,
                     "isEditable": "editable",
@@ -1294,13 +1322,13 @@
                   "postFuncBody": null
                 },
                 {
-                  "name": "target",
+                  "name": "target_battery_voltage",
                   "type": "attribute",
-                  "label": "Value",
+                  "label": "Battery voltage",
                   "color": "#4caf50",
                   "settings": {
                     "dataKeyHidden": false,
-                    "dataKeyType": "server",
+                    "dataKeyType": "shared",
                     "dataKeyValueType": "double",
                     "required": false,
                     "isEditable": "editable",
@@ -1374,7 +1402,7 @@
             "widgetTitle": "",
             "showResultMessage": true,
             "showActionButtons": true,
-            "updateAllValues": false,
+            "updateAllValues": true,
             "saveButtonLabel": "",
             "resetButtonLabel": "",
             "showGroupTitle": false,
@@ -1406,89 +1434,6 @@
         "row": 0,
         "col": 0,
         "id": "93d816a5-5705-0727-2130-467cb112bda6"
-      },
-      "95a18b78-b271-0d3e-2b5f-5d9ed2cc8ce7": {
-        "typeFullFqn": "system.cards.attributes_card",
-        "type": "latest",
-        "sizeX": 7.5,
-        "sizeY": 3,
-        "config": {
-          "datasources": [
-            {
-              "type": "entity",
-              "name": "",
-              "entityAliasId": "832c2c7d-e099-2e08-4d76-1f0e4442ed7a",
-              "dataKeys": [
-                {
-                  "name": "target_enabled",
-                  "type": "attribute",
-                  "label": "Target enabled",
-                  "color": "#4caf50",
-                  "settings": {},
-                  "_hash": 0.5680278340092402,
-                  "aggregationType": null,
-                  "units": null,
-                  "decimals": null,
-                  "funcBody": null,
-                  "usePostProcessing": null,
-                  "postFuncBody": null
-                },
-                {
-                  "name": "target",
-                  "type": "attribute",
-                  "label": "Target",
-                  "color": "#2196f3",
-                  "settings": {},
-                  "_hash": 0.5321184889387267,
-                  "aggregationType": null,
-                  "units": "V",
-                  "decimals": 3,
-                  "funcBody": null,
-                  "usePostProcessing": null,
-                  "postFuncBody": null
-                }
-              ],
-              "alarmFilterConfig": {
-                "statusList": ["ACTIVE"]
-              }
-            }
-          ],
-          "timewindow": {
-            "displayValue": "",
-            "selectedTab": 0,
-            "realtime": {
-              "realtimeType": 1,
-              "interval": 1000,
-              "timewindowMs": 60000,
-              "quickInterval": "CURRENT_DAY"
-            },
-            "history": {
-              "historyType": 0,
-              "interval": 1000,
-              "timewindowMs": 60000,
-              "fixedTimewindow": {
-                "startTimeMs": 1709289155445,
-                "endTimeMs": 1709375555445
-              },
-              "quickInterval": "CURRENT_DAY"
-            },
-            "aggregation": {
-              "type": "AVG",
-              "limit": 25000
-            }
-          },
-          "showTitle": true,
-          "backgroundColor": "#fff",
-          "color": "rgba(0, 0, 0, 0.87)",
-          "padding": "8px",
-          "settings": {},
-          "title": "Attributes card",
-          "useDashboardTimewindow": true,
-          "displayTimewindow": true
-        },
-        "row": 0,
-        "col": 0,
-        "id": "95a18b78-b271-0d3e-2b5f-5d9ed2cc8ce7"
       }
     },
     "states": {
@@ -1499,58 +1444,58 @@
           "main": {
             "widgets": {
               "44319340-4d56-1ae9-246a-e08a0ca94827": {
-                "sizeX": 6,
+                "sizeX": 8,
                 "sizeY": 6,
                 "row": 0,
                 "col": 0
               },
               "53815c90-dbad-2e65-2c1e-27eb8427afa2": {
-                "sizeX": 6,
+                "sizeX": 8,
                 "sizeY": 6,
                 "row": 6,
                 "col": 0
               },
               "04435c3c-e0ec-e82f-74ca-0633353fd93f": {
-                "sizeX": 6,
+                "sizeX": 8,
                 "sizeY": 6,
                 "row": 12,
                 "col": 0
               },
               "831fc6ee-4cf3-da8f-d794-4b22419fee2b": {
-                "sizeX": 6,
+                "sizeX": 8,
                 "sizeY": 6,
                 "row": 18,
                 "col": 0
               },
               "b9d8bb66-724b-594d-353f-0456c7340b90": {
-                "sizeX": 9,
+                "sizeX": 8,
                 "sizeY": 6,
                 "row": 0,
-                "col": 6
+                "col": 8
               },
               "013eb6e5-714f-67f1-b933-710d61d593c3": {
-                "sizeX": 9,
+                "sizeX": 8,
                 "sizeY": 6,
                 "row": 6,
-                "col": 6
+                "col": 8
               },
               "b3ec1756-0712-1067-d802-ea3dd120ed25": {
-                "sizeX": 9,
+                "sizeX": 8,
                 "sizeY": 6,
                 "row": 6,
-                "col": 15
+                "col": 16
               },
               "6f5b0636-a791-4fea-8e21-bcb4e961fdbc": {
-                "sizeX": 9,
+                "sizeX": 8,
                 "sizeY": 6,
                 "row": 12,
-                "col": 6
+                "col": 8
               },
               "1b2f00cc-b0b7-bce9-1611-48ccb6c7903b": {
-                "sizeX": 9,
+                "sizeX": 8,
                 "sizeY": 6,
                 "row": 18,
-                "col": 6
+                "col": 8
               }
             },
             "gridSettings": {
@@ -1570,22 +1515,16 @@
           "main": {
             "widgets": {
               "349f1598-40e5-371e-0b04-9a163cb9514c": {
-                "sizeX": 8,
-                "sizeY": 5,
+                "sizeX": 10,
+                "sizeY": 7,
                 "row": 0,
                 "col": 0
               },
               "93d816a5-5705-0727-2130-467cb112bda6": {
-                "sizeX": 3,
+                "sizeX": 4,
                 "sizeY": 4,
                 "row": 0,
-                "col": 8
-              },
-              "95a18b78-b271-0d3e-2b5f-5d9ed2cc8ce7": {
-                "sizeX": 4,
-                "sizeY": 3,
-                "row": 0,
-                "col": 11
+                "col": 10
               }
             },
             "gridSettings": {
