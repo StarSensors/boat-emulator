@@ -114,7 +114,7 @@
                   "decimals": null,
                   "funcBody": null,
                   "usePostProcessing": true,
-                  "postFuncBody": "var text = 'Off'\nif (value === true) {\n    text = 'On'\n}\n\nreturn text;"
+                  "postFuncBody": "var text = 'Off'\nif (value === true || value === 'true') {\n    text = 'On'\n}\n\nreturn text;"
                 },
                 {
                   "name": "target_battery_voltage",
