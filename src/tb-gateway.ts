@@ -2,7 +2,7 @@ import { connect, IClientOptions, MqttClient } from 'mqtt'
 import { Logger } from 'pino'
 import { hostname } from 'os'
 import * as _ from 'lodash'
-import { inspect } from 'util'
+// import { inspect } from 'util'
 
 import {
   // AttributesMsg,
@@ -40,6 +40,7 @@ export class TbGateway {
       previous: { [key: string]: number }
       current: { [key: string]: number }
       target?: { [key: string]: number }
+      targetEnabled?: boolean
     }
   }
 
@@ -47,6 +48,7 @@ export class TbGateway {
     this.logger = logger.child({ context: 'TbGateway' })
     this.url = url
 
+    // initialize state metric values
     this.state = _.chain(devices)
       .map(d => ({
         name: d.name,
@@ -161,14 +163,16 @@ export class TbGateway {
     }
 
     if (!targetEnabled) {
-      this.logger.info(`Target disabled for ${attrs.device}`)
-      state.target = {}
-      return
+      state.targetEnabled = false
+      this.logger.info(`Device ${attrs.device}: Target disabled`)
+    } else {
+      state.targetEnabled = true
+      this.logger.info(`Device ${attrs.device}: Target enabled`)
     }
 
     const target: any = _.chain(attrs.data)
       .keys()
-      .filter(k => k.startsWith('target_'))
+      .filter(k => k.startsWith('target_') && k !== 'target_enabled')
       .map(k => k.replace('target_', ''))
       .reduce((acc: { [key: string]: any }, metric: string) => {
         if (
@@ -306,8 +310,15 @@ export class TbGateway {
         }
 
         const target = device.target?.[metric]
+        const targetEnabled = device.targetEnabled || false
 
-        return this.getNewStateValue(value, metric, behavior, target)
+        return this.getNewStateValue(
+          value,
+          metric,
+          behavior,
+          targetEnabled,
+          target,
+        )
       })
     })
   }
@@ -316,6 +327,7 @@ export class TbGateway {
     value: number,
     metric: string,
     behavior: { step: number; min: number; max: number },
+    targetEnabled?: boolean,
     target?: number,
   ): number {
     switch (metric) {
@@ -329,7 +341,7 @@ export class TbGateway {
       case 'sensor_battery_voltage':
       case 'temperature':
       case 'water':
-        return this.getNewValueGeneric(value, behavior, target)
+        return this.getNewValueGeneric(value, behavior, targetEnabled, target)
       default:
         throw new Error(`No behavior found for metric ${metric}`)
     }
@@ -338,6 +350,7 @@ export class TbGateway {
   private getNewValueGeneric(
     value: number,
     behavior: { step: number; min: number; max: number; trend?: string },
+    targetEnabled?: boolean,
     target?: number,
   ): number {
     let random = _.random(-1, 1)
@@ -347,7 +360,7 @@ export class TbGateway {
       random = _.random(-1, 0)
     }
 
-    if (target) {
+    if (targetEnabled && target !== null && typeof target !== 'undefined') {
       if (value < target) {
         random = _.random(0, 10)
       } else if (value > target) {
