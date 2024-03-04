@@ -63,7 +63,7 @@ export const deviceProfiles: DeviceProfile[] = [
     id: 'ee3ce488-3b8b-422d-9a60-750eb358d006',
     name: 'Hall Sensor Model 001',
     description: 'Hall sensor for detecting open and close events',
-    metrics: ['sensor_battery_voltage', 'close', 'close_counter'],
+    metrics: ['sensor_battery_voltage', 'open'],
     type: 'sensor',
   },
 ]

@@ -55,10 +55,9 @@ export type RpcResponseMsg = {
 export type Metric =
   | 'battery_level'
   | 'battery_voltage'
-  | 'close_counter'
-  | 'close'
   | 'humidity'
   | 'movement_counter'
+  | 'open'
   | 'sensor_battery_level'
   | 'sensor_battery_voltage'
   | 'temperature'

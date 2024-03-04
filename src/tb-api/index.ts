@@ -32,6 +32,7 @@ import { TbDashboard, TbDashboardInfo } from './interfaces/dashboard'
 import { TbDevice, TbDeviceInfo } from './interfaces/device'
 import { TbDeviceProfile } from './interfaces/device-profile'
 import { TbRelation } from './interfaces/relation'
+import { TbTimeseriesData, TbTimeseriesValue } from './interfaces/telemetry'
 import { TbUser, TbUserActivationLink } from './interfaces/user'
 
 // constants
@@ -375,19 +376,20 @@ export class TbApi {
   }
 
   async getEntityAttributes(
-    entityType: TbEntityEnum = TbEntityEnum.DEVICE,
     deviceId: string,
+    entityType: TbEntityEnum = TbEntityEnum.DEVICE,
     keys: string[] = [],
     scope?: TbScopeEnum,
-  ): Promise<{ [key: string]: string | number }[]> {
+  ): Promise<{ latestUpdateTs: number; key: string; value: any }[]> {
     let url = `/api/plugins/telemetry/${entityType}/${deviceId}/values/attributes`
 
     if (scope) {
       url += `/${scope}`
     }
 
-    const response: AxiosResponse<{ [key: string]: string | number }[]> =
-      await this.api.get(url, { params: { keys: keys.join(',') } })
+    const response: AxiosResponse<
+      { latestUpdateTs: number; key: string; value: any }[]
+    > = await this.api.get(url, { params: { keys: keys.join(',') } })
 
     return response.data
   }
@@ -398,7 +400,7 @@ export class TbApi {
     entityType: TbEntityEnum = TbEntityEnum.DEVICE,
     scope: TbScopeEnum = TbScopeEnum.SERVER_SCOPE,
   ): Promise<void> {
-    this.logger.info(`Posting attributes to ${entityType} ${entityId}`)
+    this.logger.info(`Posting ${scope} attributes to ${entityType} ${entityId}`)
     const url = `/api/plugins/telemetry/${entityType}/${entityId}/attributes/${scope}`
     await this.api.post(url, attributes)
   }
@@ -952,5 +954,28 @@ export class TbApi {
       typeGroup: TbRelationTypeGroupEnum.COMMON,
       additionalInfo: {},
     })
+  }
+
+  async getLatestTimeseries(
+    entityId: string,
+    entityType: TbEntityEnum = TbEntityEnum.DEVICE,
+    keys?: string,
+  ) {
+    const params: any = { useStrictDataTypes: true }
+
+    if (keys) {
+      params.keys = keys
+    }
+
+    const response: AxiosResponse<TbTimeseriesData> = await this.api.get(
+      `/api/plugins/telemetry/${entityType}/${entityId}/values/timeseries`,
+      { params },
+    )
+
+    const latest = _.mapValues(response.data, (values: TbTimeseriesValue[]) =>
+      _.first(values),
+    )
+
+    return latest
   }
 }

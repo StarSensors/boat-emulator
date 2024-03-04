@@ -66,6 +66,29 @@ export class TbGateway {
       .value()
   }
 
+  setState(state: {
+    [key: string]: {
+      current: { [key: string]: number }
+      target: { [key: string]: number }
+      targetEnabled: boolean
+    }
+  }) {
+    this.state = _.mapValues(this.state, (deviceState, name) => {
+      const newState = state[name]
+
+      if (!newState) {
+        return deviceState
+      }
+
+      return {
+        ...deviceState,
+        current: { ...deviceState.current, ...newState.current },
+        target: newState.target,
+        targetEnabled: newState.targetEnabled,
+      }
+    })
+  }
+
   start(accessToken: string) {
     this.client = connect(this.url, {
       username: accessToken,
@@ -98,23 +121,10 @@ export class TbGateway {
       this.client.publish(CONNECT_TOPIC, connectMsgString)
     })
 
-    // no need for the gateway to send attributes
-    //
-    // const attributesMsg: AttributesMsg = _.chain(devices)
-    //   .keyBy('name')
-    //   .mapValues(d => ({
-    //     ...d.attributes,
-    //   }))
-    //   .value()
-    // const attributesMsgString = JSON.stringify(attributesMsg)
-    // this.logger.info('Sending attributes message')
-    // this.client.publish(ATTRIBUTES_TOPIC, attributesMsgString)
-
     this.interval = setInterval(() => {
       this.publishTelemetry()
       this.setNewState()
     }, 5000)
-    // }, 500)
   }
 
   private onMessage(topic: string, message: Buffer) {
@@ -182,7 +192,7 @@ export class TbGateway {
           acc[metric] = attrs.data[`target_${metric}`]
         }
         this.logger.info(
-          `Device ${attrs.device}: Setting ${metric} to ${acc[metric]}`,
+          `Device ${attrs.device}: Setting target ${metric} to ${acc[metric]}`,
         )
 
         return acc
@@ -295,7 +305,7 @@ export class TbGateway {
       },
     )
     const telemetryMsgString = JSON.stringify(telemetryMsg)
-    this.logger.info('Sending telemetry message')
+    this.logger.debug(`Sending telemetry message ${telemetryMsgString}`)
     this.client.publish(TELEMETRY_TOPIC, telemetryMsgString)
   }
 
@@ -334,14 +344,15 @@ export class TbGateway {
       case 'battery_level':
       case 'battery_voltage':
       case 'close_counter':
-      case 'close':
       case 'humidity':
       case 'movement_counter':
       case 'sensor_battery_level':
       case 'sensor_battery_voltage':
       case 'temperature':
-      case 'water':
         return this.getNewValueGeneric(value, behavior, targetEnabled, target)
+      case 'open':
+      case 'water':
+        return this.getNewValueSwitch(value, behavior, targetEnabled, target)
       default:
         throw new Error(`No behavior found for metric ${metric}`)
     }
@@ -370,6 +381,30 @@ export class TbGateway {
 
     const delta = random * behavior.step
     const newValue = value + delta
+
+    if (newValue > behavior.max) {
+      return behavior.max
+    } else if (newValue < behavior.min) {
+      return behavior.min
+    } else {
+      return newValue
+    }
+  }
+
+  private getNewValueSwitch(
+    value: number,
+    behavior: { step: number; min: number; max: number; trend?: string },
+    targetEnabled?: boolean,
+    target?: number,
+  ): number {
+    let newValue = _.random(0, 40) === 0 ? 1 : 0
+    if (value > 0) {
+      newValue = _.random(0, 20) === 0 ? 0 : 1
+    }
+
+    if (targetEnabled && target !== null && typeof target !== 'undefined') {
+      newValue = target
+    }
 
     if (newValue > behavior.max) {
       return behavior.max
