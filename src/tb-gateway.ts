@@ -5,28 +5,23 @@ import * as _ from 'lodash'
 // import { inspect } from 'util'
 
 import {
-  // AttributesMsg,
-  // ResponseMsg,
-  // TelemetryMsg,
   ConnectMsg,
   RpcRequestMsg,
   RpcResponseMsg,
   SharedAttributesMsg,
   TelemetryMsg,
-  // Metric,
-  // Device,
 } from './types'
 
 import { devices } from './constants/devices'
 import { metricBehaviors } from './constants/metric-behaviors'
 
-const CONNECT_TOPIC = 'v1/gateway/connect'
 // const DISCONNECT_TOPIC = 'v1/gateway/disconnect'
+// const REQUEST_TOPIC = 'v1/gateway/attributes/request'
+// const RESPONSE_TOPIC = 'v1/gateway/attributes/response'
 const ATTRIBUTES_TOPIC = 'v1/gateway/attributes'
-const REQUEST_TOPIC = 'v1/gateway/attributes/request'
-const RESPONSE_TOPIC = 'v1/gateway/attributes/response'
-const TELEMETRY_TOPIC = 'v1/gateway/telemetry'
+const CONNECT_TOPIC = 'v1/gateway/connect'
 const RPC_TOPIC = 'v1/gateway/rpc'
+const TELEMETRY_TOPIC = 'v1/gateway/telemetry'
 
 export class TbGateway {
   private logger: Logger
@@ -48,7 +43,7 @@ export class TbGateway {
     this.logger = logger.child({ context: 'TbGateway' })
     this.url = url
 
-    // initialize state metric values
+    // initialize device state with metric default start values
     this.state = _.chain(devices)
       .map(d => ({
         name: d.name,
@@ -107,9 +102,8 @@ export class TbGateway {
     this.logger.info('Connected!')
 
     this.client.subscribe(ATTRIBUTES_TOPIC)
-    this.client.subscribe(RESPONSE_TOPIC)
-    this.client.subscribe(REQUEST_TOPIC + '+')
 
+    // send connect message for each device
     devices.forEach(device => {
       const connectMsg: ConnectMsg = {
         device: device.name,
@@ -305,7 +299,7 @@ export class TbGateway {
       },
     )
     const telemetryMsgString = JSON.stringify(telemetryMsg)
-    this.logger.debug(`Sending telemetry message ${telemetryMsgString}`)
+    this.logger.debug('Sending telemetry message')
     this.client.publish(TELEMETRY_TOPIC, telemetryMsgString)
   }
 

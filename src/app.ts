@@ -8,7 +8,7 @@ import { TbGateway } from './tb-gateway'
 
 import { assetProfiles } from './constants/asset-profiles'
 import { assets } from './constants/assets'
-import { customers } from './constants/customers'
+import { customerAlarmSettings, customers } from './constants/customers'
 import { dashboardMap } from './constants/dashboards'
 import { deviceProfiles } from './constants/device-profiles'
 import { devices } from './constants/devices'
@@ -84,6 +84,15 @@ const boostrap = async () => {
   )
 
   // set customer attributes
+  for (const tbCustomer of tbCustomers) {
+    const customerId = tbCustomer.id?.id || 'unknown'
+    await tenantApi.setEntityAttributes(
+      customerId,
+      customerAlarmSettings,
+      TbEntityEnum.CUSTOMER,
+      TbScopeEnum.SERVER_SCOPE,
+    )
+  }
 
   // assign assets to customer
   for (const customer of customers) {
