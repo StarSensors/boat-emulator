@@ -119,7 +119,7 @@
                 {
                   "name": "target_battery_voltage",
                   "type": "attribute",
-                  "label": "Target voltage",
+                  "label": "Target volt.",
                   "color": "#607d8b",
                   "settings": {},
                   "_hash": 0.9770750303037647,
@@ -304,7 +304,7 @@
                 {
                   "name": "target_temperature",
                   "type": "attribute",
-                  "label": "Temperature",
+                  "label": "Target temp.",
                   "color": "#9c27b0",
                   "settings": {},
                   "_hash": 0.5246020124378084,
@@ -318,7 +318,7 @@
                 {
                   "name": "target_humidity",
                   "type": "attribute",
-                  "label": "Humidity",
+                  "label": "Target hum.",
                   "color": "#8bc34a",
                   "settings": {},
                   "_hash": 0.21791878661766928,
@@ -489,7 +489,7 @@
                 {
                   "name": "target_open",
                   "type": "attribute",
-                  "label": "State",
+                  "label": "Target state",
                   "color": "#607d8b",
                   "settings": {},
                   "_hash": 0.36450327645273917,
@@ -658,7 +658,7 @@
                 {
                   "name": "target_water",
                   "type": "attribute",
-                  "label": "State",
+                  "label": "Target state",
                   "color": "#ffc107",
                   "settings": {},
                   "_hash": 0.21976646350812423,
