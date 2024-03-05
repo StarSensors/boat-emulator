@@ -5,7 +5,208 @@ export const deviceProfiles: DeviceProfile[] = [
     id: 'ee3ce488-3b8b-422d-9a60-750eb358d000',
     name: 'Bridge Model 001',
     description: 'Bridge for IoT devices',
-    alarms: [],
+    alarms: [
+      {
+        id: '7f8ff7d9-8272-602a-205c-926b5da90b72',
+        alarmType: 'Low temperature warning',
+        createRules: {
+          WARNING: {
+            condition: {
+              condition: [
+                {
+                  key: {
+                    type: 'TIME_SERIES',
+                    key: 'temperature',
+                  },
+                  valueType: 'NUMERIC',
+                  value: null,
+                  predicate: {
+                    type: 'NUMERIC',
+                    operation: 'LESS_OR_EQUAL',
+                    value: {
+                      defaultValue: 0,
+                      userValue: null,
+                      dynamicValue: {
+                        sourceType: 'CURRENT_DEVICE',
+                        sourceAttribute:
+                          'customer_alarm_temperature_low_warning_threshold',
+                        inherit: true,
+                      },
+                    },
+                  },
+                },
+                {
+                  key: {
+                    type: 'CONSTANT',
+                    key: 'customer_alarm_temperature_low_warning_enabled',
+                  },
+                  valueType: 'BOOLEAN',
+                  value: true,
+                  predicate: {
+                    type: 'BOOLEAN',
+                    operation: 'EQUAL',
+                    value: {
+                      defaultValue: false,
+                      userValue: null,
+                      dynamicValue: {
+                        sourceType: 'CURRENT_DEVICE',
+                        sourceAttribute:
+                          'customer_alarm_temperature_low_warning_enabled',
+                        inherit: true,
+                      },
+                    },
+                  },
+                },
+              ],
+              spec: {
+                type: 'SIMPLE',
+              },
+            },
+            schedule: null,
+            alarmDetails: null,
+            dashboardId: null,
+          },
+        },
+        clearRule: {
+          condition: {
+            condition: [
+              {
+                key: {
+                  type: 'TIME_SERIES',
+                  key: 'temperature',
+                },
+                valueType: 'NUMERIC',
+                value: null,
+                predicate: {
+                  type: 'NUMERIC',
+                  operation: 'GREATER',
+                  value: {
+                    defaultValue: 0,
+                    userValue: null,
+                    dynamicValue: {
+                      sourceType: 'CURRENT_DEVICE',
+                      sourceAttribute:
+                        'customer_alarm_temperature_low_warning_threshold',
+                      inherit: true,
+                    },
+                  },
+                },
+              },
+            ],
+            spec: {
+              type: 'SIMPLE',
+            },
+          },
+          schedule: null,
+          alarmDetails: null,
+          dashboardId: null,
+        },
+        propagate: false,
+        propagateToOwner: false,
+        propagateToTenant: false,
+        propagateRelationTypes: null,
+      },
+      {
+        id: 'f612ed1b-e290-c312-c25d-39eb2856bd00',
+        alarmType: 'High temperature warning',
+        createRules: {
+          WARNING: {
+            condition: {
+              condition: [
+                {
+                  key: {
+                    type: 'TIME_SERIES',
+                    key: 'temperature',
+                  },
+                  valueType: 'NUMERIC',
+                  value: null,
+                  predicate: {
+                    type: 'NUMERIC',
+                    operation: 'GREATER_OR_EQUAL',
+                    value: {
+                      defaultValue: 0,
+                      userValue: null,
+                      dynamicValue: {
+                        sourceType: 'CURRENT_DEVICE',
+                        sourceAttribute:
+                          'customer_alarm_temperature_high_warning_threshold',
+                        inherit: true,
+                      },
+                    },
+                  },
+                },
+                {
+                  key: {
+                    type: 'CONSTANT',
+                    key: 'customer_alarm_temperature_high_warning_enabled',
+                  },
+                  valueType: 'BOOLEAN',
+                  value: true,
+                  predicate: {
+                    type: 'BOOLEAN',
+                    operation: 'EQUAL',
+                    value: {
+                      defaultValue: false,
+                      userValue: null,
+                      dynamicValue: {
+                        sourceType: 'CURRENT_DEVICE',
+                        sourceAttribute:
+                          'customer_alarm_temperature_high_warning_enabled',
+                        inherit: true,
+                      },
+                    },
+                  },
+                },
+              ],
+              spec: {
+                type: 'SIMPLE',
+              },
+            },
+            schedule: null,
+            alarmDetails: null,
+            dashboardId: null,
+          },
+        },
+        clearRule: {
+          condition: {
+            condition: [
+              {
+                key: {
+                  type: 'TIME_SERIES',
+                  key: 'temperature',
+                },
+                valueType: 'NUMERIC',
+                value: null,
+                predicate: {
+                  type: 'NUMERIC',
+                  operation: 'LESS',
+                  value: {
+                    defaultValue: 0,
+                    userValue: null,
+                    dynamicValue: {
+                      sourceType: 'CURRENT_DEVICE',
+                      sourceAttribute:
+                        'customer_alarm_temperature_high_warning_threshold',
+                      inherit: true,
+                    },
+                  },
+                },
+              },
+            ],
+            spec: {
+              type: 'SIMPLE',
+            },
+          },
+          schedule: null,
+          alarmDetails: null,
+          dashboardId: null,
+        },
+        propagate: false,
+        propagateToOwner: false,
+        propagateToTenant: false,
+        propagateRelationTypes: null,
+      },
+    ],
     metrics: [
       'sensor_battery_voltage',
       'sensor_battery_level',
