@@ -10,7 +10,7 @@ export type TbDeviceProfileAlarm = {
   propagate?: boolean
   propagateToOwner?: boolean
   propagateToTenant?: boolean
-  propagateRelationTypes?: string[]
+  propagateRelationTypes?: string[] | null
 }
 
 export type TbDeviceProfileData = {

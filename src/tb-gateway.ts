@@ -367,9 +367,9 @@ export class TbGateway {
 
     if (targetEnabled && target !== null && typeof target !== 'undefined') {
       if (value < target) {
-        random = _.random(0, 10)
+        random = _.random(0, 20)
       } else if (value > target) {
-        random = _.random(-10, 0)
+        random = _.random(-20, 0)
       }
     }
 

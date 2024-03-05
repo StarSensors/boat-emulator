@@ -78,6 +78,7 @@ export type DeviceProfile = {
   id: string
   name: DeviceProfileName
   description?: string
+  alarms?: any[]
   metrics: Metric[]
   type: DeviceProfileType
 }

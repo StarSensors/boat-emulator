@@ -42,6 +42,7 @@ const boostrap = async () => {
         deviceProfile.name,
         deviceProfile.id,
         deviceProfile.description,
+        deviceProfile.alarms,
       ),
     ),
   )

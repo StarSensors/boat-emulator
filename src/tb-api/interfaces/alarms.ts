@@ -54,7 +54,6 @@ export type TbAlarmConditionFilter = {
 
 export type TbAlarmCondition = {
   condition?: TbAlarmConditionFilter[]
-  /** JSON object representing alarm condition type */
   spec?: object
 }
 
@@ -71,7 +70,7 @@ export type TbAlarmSchedule = {
 
 export type TbAlarmRule = {
   condition?: TbAlarmCondition
-  schedule?: TbAlarmSchedule
-  alarmDetails?: string
-  dashboardId?: TbEntityEnum
+  schedule?: TbAlarmSchedule | null
+  alarmDetails?: string | null
+  dashboardId?: TbEntityEnum | null
 }
