@@ -9,6 +9,7 @@ import axios, {
 } from 'axios'
 import * as _ from 'lodash'
 import * as querystring from 'querystring'
+import { inspect } from 'util'
 
 // types
 import { TbClientType, TbApiEntity } from './types'
@@ -30,8 +31,12 @@ import { TbAssetProfile } from './interfaces/asset-profile'
 import { TbCustomer } from './interfaces/customer'
 import { TbDashboard, TbDashboardInfo } from './interfaces/dashboard'
 import { TbDevice, TbDeviceInfo } from './interfaces/device'
-import { TbDeviceProfile } from './interfaces/device-profile'
+import {
+  TbDeviceProfile,
+  TbDeviceProfileAlarm,
+} from './interfaces/device-profile'
 import { TbRelation } from './interfaces/relation'
+import { TbTimeseriesData, TbTimeseriesValue } from './interfaces/telemetry'
 import { TbUser, TbUserActivationLink } from './interfaces/user'
 
 // constants
@@ -375,19 +380,20 @@ export class TbApi {
   }
 
   async getEntityAttributes(
-    entityType: TbEntityEnum = TbEntityEnum.DEVICE,
     deviceId: string,
+    entityType: TbEntityEnum = TbEntityEnum.DEVICE,
     keys: string[] = [],
     scope?: TbScopeEnum,
-  ): Promise<{ [key: string]: string | number }[]> {
+  ): Promise<{ latestUpdateTs: number; key: string; value: any }[]> {
     let url = `/api/plugins/telemetry/${entityType}/${deviceId}/values/attributes`
 
     if (scope) {
       url += `/${scope}`
     }
 
-    const response: AxiosResponse<{ [key: string]: string | number }[]> =
-      await this.api.get(url, { params: { keys: keys.join(',') } })
+    const response: AxiosResponse<
+      { latestUpdateTs: number; key: string; value: any }[]
+    > = await this.api.get(url, { params: { keys: keys.join(',') } })
 
     return response.data
   }
@@ -398,7 +404,7 @@ export class TbApi {
     entityType: TbEntityEnum = TbEntityEnum.DEVICE,
     scope: TbScopeEnum = TbScopeEnum.SERVER_SCOPE,
   ): Promise<void> {
-    this.logger.info(`Posting attributes to ${entityType} ${entityId}`)
+    this.logger.info(`Posting ${scope} attributes to ${entityType} ${entityId}`)
     const url = `/api/plugins/telemetry/${entityType}/${entityId}/attributes/${scope}`
     await this.api.post(url, attributes)
   }
@@ -460,54 +466,78 @@ export class TbApi {
     name: string,
     externalId: string,
     description?: string,
+    alarms: TbDeviceProfileAlarm[] = [],
   ): Promise<TbDeviceProfile> {
     const tbDeviceProfiles =
       await this.getEntities<TbDeviceProfile>('device-profile')
 
-    let tbDeviceProfile = _.find(tbDeviceProfiles, { name }) as TbDeviceProfile
+    let tbDeviceProfile = _.find(tbDeviceProfiles, {
+      name,
+    }) as TbDeviceProfile
 
     if (tbDeviceProfile) {
       if (
         tbDeviceProfile.description === description &&
-        tbDeviceProfile.externalId?.id === externalId
+        tbDeviceProfile.externalId?.id === externalId &&
+        _.isEqual(tbDeviceProfile.profileData.alarms, alarms)
       ) {
         this.logger.info(`Device profile ${name}: In sync`)
       } else {
-        this.logger.info(
-          `Device profile ${name}: Updating description and externalId`,
-        )
-        tbDeviceProfile = await this.upsertEntity<TbDeviceProfile>('device', {
-          ...tbDeviceProfile,
-          description,
-          externalId: {
+        if (tbDeviceProfile.description !== description) {
+          this.logger.info(`Device profile ${name}: Updating description`)
+          tbDeviceProfile.description = description
+        }
+
+        if (tbDeviceProfile.externalId?.id !== externalId) {
+          this.logger.info(`Device profile ${name}: Updating externalId`)
+          tbDeviceProfile.externalId = {
             entityType: TbEntityEnum.DEVICE_PROFILE,
             id: externalId,
-          },
-        })
+          }
+        }
+
+        if (!_.isEqual(tbDeviceProfile.profileData.alarms, alarms)) {
+          this.logger.info(`Device profile ${name}: Updating alarms`)
+
+          console.log('old', JSON.stringify(tbDeviceProfile.profileData.alarms))
+          console.log('new', JSON.stringify(alarms))
+
+          tbDeviceProfile.profileData.alarms = alarms
+        }
+
+        tbDeviceProfile = await this.upsertEntity<TbDeviceProfile>(
+          'device-profile',
+          tbDeviceProfile,
+        )
       }
     } else {
-      this.logger.info(`Device profile ${name}: Creating new device profile.`)
+      this.logger.info(
+        `Device profile ${name}: Creating new device profile with ${alarms.length} alarms.`,
+      )
+
+      const newTbDeviceProfile: TbDeviceProfile = {
+        name,
+        description,
+        transportType: TbTransportEnum.DEFAULT,
+        profileData: {
+          configuration: { type: 'DEFAULT' },
+          provisionConfiguration: {
+            type: TbProvisionTypeEnum.DISABLED,
+            provisionDeviceSecret: null,
+          },
+          transportConfiguration: { type: TbTransportEnum.DEFAULT },
+          alarms,
+        },
+        type: 'DEFAULT',
+        externalId: {
+          entityType: TbEntityEnum.DEVICE_PROFILE,
+          id: externalId,
+        },
+      }
 
       tbDeviceProfile = await this.upsertEntity<TbDeviceProfile>(
         'device-profile',
-        {
-          name,
-          description,
-          transportType: TbTransportEnum.DEFAULT,
-          profileData: {
-            configuration: { type: 'DEFAULT' },
-            provisionConfiguration: {
-              type: TbProvisionTypeEnum.DISABLED,
-              provisionDeviceSecret: null,
-            },
-            transportConfiguration: { type: TbTransportEnum.DEFAULT },
-          },
-          type: 'DEFAULT',
-          externalId: {
-            entityType: TbEntityEnum.DEVICE_PROFILE,
-            id: externalId,
-          },
-        },
+        newTbDeviceProfile,
       )
     }
 
@@ -952,5 +982,28 @@ export class TbApi {
       typeGroup: TbRelationTypeGroupEnum.COMMON,
       additionalInfo: {},
     })
+  }
+
+  async getLatestTimeseries(
+    entityId: string,
+    entityType: TbEntityEnum = TbEntityEnum.DEVICE,
+    keys?: string,
+  ) {
+    const params: any = { useStrictDataTypes: true }
+
+    if (keys) {
+      params.keys = keys
+    }
+
+    const response: AxiosResponse<TbTimeseriesData> = await this.api.get(
+      `/api/plugins/telemetry/${entityType}/${entityId}/values/timeseries`,
+      { params },
+    )
+
+    const latest = _.mapValues(response.data, (values: TbTimeseriesValue[]) =>
+      _.first(values),
+    )
+
+    return latest
   }
 }

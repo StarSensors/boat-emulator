@@ -1,0 +1,1423 @@
+{
+  "title": "Alarm settings",
+  "image": null,
+  "mobileHide": false,
+  "mobileOrder": null,
+  "configuration": {
+    "description": "",
+    "widgets": {
+      "cf50bdfe-6352-cced-4de8-51a02a608048": {
+        "typeFullFqn": "system.input_widgets.update_multiple_attributes",
+        "type": "latest",
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": "",
+              "entityAliasId": "8546a2fc-af70-6a89-6868-1c5c7454fd1b",
+              "dataKeys": [
+                {
+                  "name": "customer_alarm_battery_voltage_low_warning_enabled",
+                  "type": "attribute",
+                  "label": "Enabled",
+                  "color": "#2196f3",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "booleanSwitch",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "before",
+                    "selectOptions": [],
+                    "step": 1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "notifications",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9970209595304413,
+                  "aggregationType": null,
+                  "units": null,
+                  "decimals": null,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                },
+                {
+                  "name": "customer_alarm_battery_voltage_low_warning_threshold",
+                  "type": "attribute",
+                  "label": "Voltage level",
+                  "color": "#4caf50",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "double",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "after",
+                    "selectOptions": [],
+                    "step": 0.1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9562024008221717,
+                  "aggregationType": null,
+                  "units": "V",
+                  "decimals": 2,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                }
+              ],
+              "alarmFilterConfig": {
+                "statusList": ["ACTIVE"]
+              }
+            }
+          ],
+          "timewindow": {
+            "displayValue": "",
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 1,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "quickInterval": "CURRENT_DAY"
+            },
+            "history": {
+              "historyType": 0,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "fixedTimewindow": {
+                "startTimeMs": 1709400392335,
+                "endTimeMs": 1709486792335
+              },
+              "quickInterval": "CURRENT_DAY"
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "widgetTitle": "Low battery warning",
+            "showResultMessage": true,
+            "showActionButtons": true,
+            "updateAllValues": true,
+            "saveButtonLabel": "",
+            "resetButtonLabel": "",
+            "showGroupTitle": false,
+            "groupTitle": "${entityName}",
+            "fieldsAlignment": "row",
+            "fieldsInRow": 1,
+            "rowGap": 5,
+            "columnGap": 10
+          },
+          "title": "Low battery warning",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "enableDataExport": false,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {},
+          "displayTimewindow": true,
+          "showTitleIcon": true,
+          "titleIcon": "battery_2_bar",
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetCss": "",
+          "pageSize": 1024,
+          "noDataDisplayMessage": ""
+        },
+        "row": 0,
+        "col": 0,
+        "id": "cf50bdfe-6352-cced-4de8-51a02a608048"
+      },
+      "056f36ab-1d0e-4bac-88b3-e7d013319b3c": {
+        "typeFullFqn": "system.input_widgets.update_multiple_attributes",
+        "type": "latest",
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": "",
+              "entityAliasId": "8546a2fc-af70-6a89-6868-1c5c7454fd1b",
+              "dataKeys": [
+                {
+                  "name": "customer_alarm_battery_voltage_low_critical_enabled",
+                  "type": "attribute",
+                  "label": "Enabled",
+                  "color": "#2196f3",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "booleanSwitch",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "before",
+                    "selectOptions": [],
+                    "step": 1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "notifications",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9970209595304413,
+                  "aggregationType": null,
+                  "units": null,
+                  "decimals": null,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                },
+                {
+                  "name": "customer_alarm_battery_voltage_low_critical_threshold",
+                  "type": "attribute",
+                  "label": "Voltage level",
+                  "color": "#4caf50",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "double",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "after",
+                    "selectOptions": [],
+                    "step": 1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9562024008221717,
+                  "aggregationType": null,
+                  "units": "V",
+                  "decimals": 2,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                }
+              ],
+              "alarmFilterConfig": {
+                "statusList": ["ACTIVE"]
+              }
+            }
+          ],
+          "timewindow": {
+            "displayValue": "",
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 1,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "quickInterval": "CURRENT_DAY"
+            },
+            "history": {
+              "historyType": 0,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "fixedTimewindow": {
+                "startTimeMs": 1709400392335,
+                "endTimeMs": 1709486792335
+              },
+              "quickInterval": "CURRENT_DAY"
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "widgetTitle": "Low battery critical",
+            "showResultMessage": true,
+            "showActionButtons": true,
+            "updateAllValues": true,
+            "saveButtonLabel": "",
+            "resetButtonLabel": "",
+            "showGroupTitle": false,
+            "groupTitle": "${entityName}",
+            "fieldsAlignment": "row",
+            "fieldsInRow": 1,
+            "rowGap": 5,
+            "columnGap": 10
+          },
+          "title": "Low battery critical",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "enableDataExport": false,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {},
+          "displayTimewindow": true,
+          "showTitleIcon": true,
+          "titleIcon": "battery_alert",
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetCss": "",
+          "pageSize": 1024,
+          "noDataDisplayMessage": ""
+        },
+        "row": 0,
+        "col": 0,
+        "id": "056f36ab-1d0e-4bac-88b3-e7d013319b3c"
+      },
+      "b7ef349d-a878-7619-e1e9-3f4b10470625": {
+        "typeFullFqn": "system.input_widgets.update_multiple_attributes",
+        "type": "latest",
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": "",
+              "entityAliasId": "8546a2fc-af70-6a89-6868-1c5c7454fd1b",
+              "dataKeys": [
+                {
+                  "name": "customer_alarm_water_high_warning_enabled",
+                  "type": "attribute",
+                  "label": "Enabled",
+                  "color": "#2196f3",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "booleanSwitch",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "before",
+                    "selectOptions": [],
+                    "step": 1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "notifications",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9970209595304413,
+                  "aggregationType": null,
+                  "units": null,
+                  "decimals": null,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                }
+              ],
+              "alarmFilterConfig": {
+                "statusList": ["ACTIVE"]
+              }
+            }
+          ],
+          "timewindow": {
+            "displayValue": "",
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 1,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "quickInterval": "CURRENT_DAY"
+            },
+            "history": {
+              "historyType": 0,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "fixedTimewindow": {
+                "startTimeMs": 1709400392335,
+                "endTimeMs": 1709486792335
+              },
+              "quickInterval": "CURRENT_DAY"
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "widgetTitle": "Water warning",
+            "showResultMessage": true,
+            "showActionButtons": true,
+            "updateAllValues": true,
+            "saveButtonLabel": "",
+            "resetButtonLabel": "",
+            "showGroupTitle": false,
+            "groupTitle": "${entityName}",
+            "fieldsAlignment": "row",
+            "fieldsInRow": 1,
+            "rowGap": 5,
+            "columnGap": 10
+          },
+          "title": "Water warning",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "enableDataExport": false,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {},
+          "displayTimewindow": true,
+          "showTitleIcon": true,
+          "titleIcon": "water",
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetCss": "",
+          "pageSize": 1024,
+          "noDataDisplayMessage": ""
+        },
+        "row": 0,
+        "col": 0,
+        "id": "b7ef349d-a878-7619-e1e9-3f4b10470625"
+      },
+      "021cd754-dd85-b5b1-2771-e154dde7c272": {
+        "typeFullFqn": "system.input_widgets.update_multiple_attributes",
+        "type": "latest",
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": "",
+              "entityAliasId": "8546a2fc-af70-6a89-6868-1c5c7454fd1b",
+              "dataKeys": [
+                {
+                  "name": "customer_alarm_humidity_high_warning_enabled",
+                  "type": "attribute",
+                  "label": "Enabled",
+                  "color": "#2196f3",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "booleanSwitch",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "before",
+                    "selectOptions": [],
+                    "step": 1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "notifications",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9970209595304413,
+                  "aggregationType": null,
+                  "units": null,
+                  "decimals": null,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                },
+                {
+                  "name": "customer_alarm_humidity_high_warning_threshold",
+                  "type": "attribute",
+                  "label": "Humidity",
+                  "color": "#4caf50",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "double",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "after",
+                    "selectOptions": [],
+                    "step": 0.1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9562024008221717,
+                  "aggregationType": null,
+                  "units": "%",
+                  "decimals": 0,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                }
+              ],
+              "alarmFilterConfig": {
+                "statusList": ["ACTIVE"]
+              }
+            }
+          ],
+          "timewindow": {
+            "displayValue": "",
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 1,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "quickInterval": "CURRENT_DAY"
+            },
+            "history": {
+              "historyType": 0,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "fixedTimewindow": {
+                "startTimeMs": 1709400392335,
+                "endTimeMs": 1709486792335
+              },
+              "quickInterval": "CURRENT_DAY"
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "widgetTitle": "Humidity warning",
+            "showResultMessage": true,
+            "showActionButtons": true,
+            "updateAllValues": true,
+            "saveButtonLabel": "",
+            "resetButtonLabel": "",
+            "showGroupTitle": false,
+            "groupTitle": "${entityName}",
+            "fieldsAlignment": "row",
+            "fieldsInRow": 1,
+            "rowGap": 5,
+            "columnGap": 10
+          },
+          "title": "Humidity warning",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "enableDataExport": false,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {},
+          "displayTimewindow": true,
+          "showTitleIcon": true,
+          "titleIcon": "mdi:water-percent",
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetCss": "",
+          "pageSize": 1024,
+          "noDataDisplayMessage": ""
+        },
+        "row": 0,
+        "col": 0,
+        "id": "021cd754-dd85-b5b1-2771-e154dde7c272"
+      },
+      "6d1ffdbd-d19a-0fb2-e767-5f400531b324": {
+        "typeFullFqn": "system.input_widgets.update_multiple_attributes",
+        "type": "latest",
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": "",
+              "entityAliasId": "8546a2fc-af70-6a89-6868-1c5c7454fd1b",
+              "dataKeys": [
+                {
+                  "name": "customer_alarm_humidity_high_critical_enabled",
+                  "type": "attribute",
+                  "label": "Enabled",
+                  "color": "#2196f3",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "booleanSwitch",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "before",
+                    "selectOptions": [],
+                    "step": 1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "notifications",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9970209595304413,
+                  "aggregationType": null,
+                  "units": null,
+                  "decimals": null,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                },
+                {
+                  "name": "customer_alarm_humidity_high_critical_threshold",
+                  "type": "attribute",
+                  "label": "Humidity",
+                  "color": "#4caf50",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "double",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "after",
+                    "selectOptions": [],
+                    "step": 0.1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9562024008221717,
+                  "aggregationType": null,
+                  "units": "%",
+                  "decimals": 0,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                }
+              ],
+              "alarmFilterConfig": {
+                "statusList": ["ACTIVE"]
+              }
+            }
+          ],
+          "timewindow": {
+            "displayValue": "",
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 1,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "quickInterval": "CURRENT_DAY"
+            },
+            "history": {
+              "historyType": 0,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "fixedTimewindow": {
+                "startTimeMs": 1709400392335,
+                "endTimeMs": 1709486792335
+              },
+              "quickInterval": "CURRENT_DAY"
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "widgetTitle": "Humidity critical",
+            "showResultMessage": true,
+            "showActionButtons": true,
+            "updateAllValues": true,
+            "saveButtonLabel": "",
+            "resetButtonLabel": "",
+            "showGroupTitle": false,
+            "groupTitle": "${entityName}",
+            "fieldsAlignment": "row",
+            "fieldsInRow": 1,
+            "rowGap": 5,
+            "columnGap": 10
+          },
+          "title": "Humidity critical",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "enableDataExport": false,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {},
+          "displayTimewindow": true,
+          "showTitleIcon": true,
+          "titleIcon": "mdi:water-percent-alert",
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetCss": "",
+          "pageSize": 1024,
+          "noDataDisplayMessage": ""
+        },
+        "row": 0,
+        "col": 0,
+        "id": "6d1ffdbd-d19a-0fb2-e767-5f400531b324"
+      },
+      "aa46275c-0239-7f6d-e886-cf82cd85f86f": {
+        "typeFullFqn": "system.input_widgets.update_multiple_attributes",
+        "type": "latest",
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": "",
+              "entityAliasId": "8546a2fc-af70-6a89-6868-1c5c7454fd1b",
+              "dataKeys": [
+                {
+                  "name": "customer_alarm_temperature_high_warning_enabled",
+                  "type": "attribute",
+                  "label": "Enabled",
+                  "color": "#2196f3",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "booleanSwitch",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "before",
+                    "selectOptions": [],
+                    "step": 1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "notifications",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9970209595304413,
+                  "aggregationType": null,
+                  "units": null,
+                  "decimals": null,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                },
+                {
+                  "name": "customer_alarm_temperature_high_warning_threshold",
+                  "type": "attribute",
+                  "label": "Temperature",
+                  "color": "#4caf50",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "double",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "after",
+                    "selectOptions": [],
+                    "step": 0.1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9562024008221717,
+                  "aggregationType": null,
+                  "units": "°C",
+                  "decimals": 1,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                }
+              ],
+              "alarmFilterConfig": {
+                "statusList": ["ACTIVE"]
+              }
+            }
+          ],
+          "timewindow": {
+            "displayValue": "",
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 1,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "quickInterval": "CURRENT_DAY"
+            },
+            "history": {
+              "historyType": 0,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "fixedTimewindow": {
+                "startTimeMs": 1709400392335,
+                "endTimeMs": 1709486792335
+              },
+              "quickInterval": "CURRENT_DAY"
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "widgetTitle": "High temperature warning",
+            "showResultMessage": true,
+            "showActionButtons": true,
+            "updateAllValues": true,
+            "saveButtonLabel": "",
+            "resetButtonLabel": "",
+            "showGroupTitle": false,
+            "groupTitle": "${entityName}",
+            "fieldsAlignment": "row",
+            "fieldsInRow": 1,
+            "rowGap": 5,
+            "columnGap": 10
+          },
+          "title": "High temperature warning",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "enableDataExport": false,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {},
+          "displayTimewindow": true,
+          "showTitleIcon": true,
+          "titleIcon": "mdi:sun-thermometer-outline",
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetCss": "",
+          "pageSize": 1024,
+          "noDataDisplayMessage": ""
+        },
+        "row": 0,
+        "col": 0,
+        "id": "aa46275c-0239-7f6d-e886-cf82cd85f86f"
+      },
+      "9836d8c3-6e67-8016-3da9-4ec2e581f9e3": {
+        "typeFullFqn": "system.input_widgets.update_multiple_attributes",
+        "type": "latest",
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": "",
+              "entityAliasId": "8546a2fc-af70-6a89-6868-1c5c7454fd1b",
+              "dataKeys": [
+                {
+                  "name": "customer_alarm_temperature_low_warning_enabled",
+                  "type": "attribute",
+                  "label": "Enabled",
+                  "color": "#2196f3",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "booleanSwitch",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "before",
+                    "selectOptions": [],
+                    "step": 1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "notifications",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9970209595304413,
+                  "aggregationType": null,
+                  "units": null,
+                  "decimals": null,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                },
+                {
+                  "name": "customer_alarm_temperature_low_warning_threshold",
+                  "type": "attribute",
+                  "label": "Temperature",
+                  "color": "#4caf50",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "double",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "after",
+                    "selectOptions": [],
+                    "step": 0.1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9562024008221717,
+                  "aggregationType": null,
+                  "units": "°C",
+                  "decimals": 1,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                }
+              ],
+              "alarmFilterConfig": {
+                "statusList": ["ACTIVE"]
+              }
+            }
+          ],
+          "timewindow": {
+            "displayValue": "",
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 1,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "quickInterval": "CURRENT_DAY"
+            },
+            "history": {
+              "historyType": 0,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "fixedTimewindow": {
+                "startTimeMs": 1709400392335,
+                "endTimeMs": 1709486792335
+              },
+              "quickInterval": "CURRENT_DAY"
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "widgetTitle": "Low temperature warning",
+            "showResultMessage": true,
+            "showActionButtons": true,
+            "updateAllValues": true,
+            "saveButtonLabel": "",
+            "resetButtonLabel": "",
+            "showGroupTitle": false,
+            "groupTitle": "${entityName}",
+            "fieldsAlignment": "row",
+            "fieldsInRow": 1,
+            "rowGap": 5,
+            "columnGap": 10
+          },
+          "title": "Low temperature warning",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "enableDataExport": false,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {},
+          "displayTimewindow": true,
+          "showTitleIcon": true,
+          "titleIcon": "mdi:snowflake-thermometer",
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetCss": "",
+          "pageSize": 1024,
+          "noDataDisplayMessage": ""
+        },
+        "row": 0,
+        "col": 0,
+        "id": "9836d8c3-6e67-8016-3da9-4ec2e581f9e3"
+      },
+      "f833bdf2-6ac3-8807-dfb6-89c02824c628": {
+        "typeFullFqn": "system.input_widgets.update_multiple_attributes",
+        "type": "latest",
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": "",
+              "entityAliasId": "8546a2fc-af70-6a89-6868-1c5c7454fd1b",
+              "dataKeys": [
+                {
+                  "name": "customer_alarm_open_high_warning_enabled",
+                  "type": "attribute",
+                  "label": "Enabled",
+                  "color": "#2196f3",
+                  "settings": {
+                    "dataKeyHidden": false,
+                    "dataKeyType": "server",
+                    "dataKeyValueType": "booleanSwitch",
+                    "required": false,
+                    "isEditable": "editable",
+                    "disabledOnDataKey": "",
+                    "appearance": "outline",
+                    "subscriptSizing": "fixed",
+                    "slideToggleLabelPosition": "before",
+                    "selectOptions": [],
+                    "step": 1,
+                    "minValue": null,
+                    "maxValue": null,
+                    "requiredErrorMessage": "",
+                    "minValueErrorMessage": "",
+                    "maxValueErrorMessage": "",
+                    "invalidDateErrorMessage": "",
+                    "invalidJsonErrorMessage": "",
+                    "dialogTitle": "",
+                    "saveButtonLabel": "",
+                    "cancelButtonLabel": "",
+                    "useCustomIcon": false,
+                    "icon": "notifications",
+                    "customIcon": "",
+                    "useGetValueFunction": false,
+                    "getValueFunctionBody": "",
+                    "useSetValueFunction": false,
+                    "setValueFunctionBody": ""
+                  },
+                  "_hash": 0.9970209595304413,
+                  "aggregationType": null,
+                  "units": null,
+                  "decimals": null,
+                  "funcBody": null,
+                  "usePostProcessing": null,
+                  "postFuncBody": null
+                }
+              ],
+              "alarmFilterConfig": {
+                "statusList": ["ACTIVE"]
+              }
+            }
+          ],
+          "timewindow": {
+            "displayValue": "",
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 1,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "quickInterval": "CURRENT_DAY"
+            },
+            "history": {
+              "historyType": 0,
+              "interval": 1000,
+              "timewindowMs": 60000,
+              "fixedTimewindow": {
+                "startTimeMs": 1709400392335,
+                "endTimeMs": 1709486792335
+              },
+              "quickInterval": "CURRENT_DAY"
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "widgetTitle": "Door open warning",
+            "showResultMessage": true,
+            "showActionButtons": true,
+            "updateAllValues": true,
+            "saveButtonLabel": "",
+            "resetButtonLabel": "",
+            "showGroupTitle": false,
+            "groupTitle": "${entityName}",
+            "fieldsAlignment": "row",
+            "fieldsInRow": 1,
+            "rowGap": 5,
+            "columnGap": 10
+          },
+          "title": "Door open warning",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "enableDataExport": false,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {},
+          "displayTimewindow": true,
+          "showTitleIcon": true,
+          "titleIcon": "meeting_room",
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetCss": "",
+          "pageSize": 1024,
+          "noDataDisplayMessage": ""
+        },
+        "row": 0,
+        "col": 0,
+        "id": "f833bdf2-6ac3-8807-dfb6-89c02824c628"
+      }
+    },
+    "states": {
+      "default": {
+        "name": "Alarm settings",
+        "root": true,
+        "layouts": {
+          "main": {
+            "widgets": {
+              "cf50bdfe-6352-cced-4de8-51a02a608048": {
+                "sizeX": 7,
+                "sizeY": 4,
+                "row": 0,
+                "col": 0
+              },
+              "056f36ab-1d0e-4bac-88b3-e7d013319b3c": {
+                "sizeX": 7,
+                "sizeY": 4,
+                "row": 0,
+                "col": 7
+              },
+              "b7ef349d-a878-7619-e1e9-3f4b10470625": {
+                "sizeX": 7,
+                "sizeY": 4,
+                "row": 4,
+                "col": 0
+              },
+              "021cd754-dd85-b5b1-2771-e154dde7c272": {
+                "sizeX": 7,
+                "sizeY": 4,
+                "row": 8,
+                "col": 0
+              },
+              "6d1ffdbd-d19a-0fb2-e767-5f400531b324": {
+                "sizeX": 7,
+                "sizeY": 4,
+                "row": 8,
+                "col": 7
+              },
+              "aa46275c-0239-7f6d-e886-cf82cd85f86f": {
+                "sizeX": 7,
+                "sizeY": 4,
+                "row": 12,
+                "col": 7
+              },
+              "9836d8c3-6e67-8016-3da9-4ec2e581f9e3": {
+                "sizeX": 7,
+                "sizeY": 4,
+                "row": 12,
+                "col": 0
+              },
+              "f833bdf2-6ac3-8807-dfb6-89c02824c628": {
+                "sizeX": 7,
+                "sizeY": 4,
+                "row": 4,
+                "col": 7
+              }
+            },
+            "gridSettings": {
+              "backgroundColor": "#eeeeee",
+              "columns": 24,
+              "margin": 10,
+              "outerMargin": true,
+              "backgroundSizeMode": "100%"
+            }
+          }
+        }
+      }
+    },
+    "entityAliases": {
+      "8546a2fc-af70-6a89-6868-1c5c7454fd1b": {
+        "id": "8546a2fc-af70-6a89-6868-1c5c7454fd1b",
+        "alias": "Current customer",
+        "filter": {
+          "type": "singleEntity",
+          "resolveMultiple": false,
+          "singleEntity": {
+            "entityType": "CURRENT_CUSTOMER",
+            "id": "9493fad1-da32-11ee-8602-377653ca3d21"
+          }
+        }
+      }
+    },
+    "filters": {},
+    "timewindow": {
+      "displayValue": "",
+      "hideInterval": false,
+      "hideLastInterval": false,
+      "hideQuickInterval": false,
+      "hideAggregation": false,
+      "hideAggInterval": false,
+      "hideTimezone": false,
+      "selectedTab": 0,
+      "realtime": {
+        "realtimeType": 0,
+        "interval": 1000,
+        "timewindowMs": 60000,
+        "quickInterval": "CURRENT_DAY"
+      },
+      "history": {
+        "historyType": 0,
+        "interval": 1000,
+        "timewindowMs": 60000,
+        "fixedTimewindow": {
+          "startTimeMs": 1709400091775,
+          "endTimeMs": 1709486491775
+        },
+        "quickInterval": "CURRENT_DAY"
+      },
+      "aggregation": {
+        "type": "AVG",
+        "limit": 25000
+      }
+    },
+    "settings": {
+      "stateControllerId": "entity",
+      "showTitle": false,
+      "showDashboardsSelect": true,
+      "showEntitiesSelect": true,
+      "showDashboardTimewindow": true,
+      "showDashboardExport": true,
+      "toolbarAlwaysOpen": true
+    }
+  },
+  "name": "Alarm settings"
+}

@@ -9,9 +9,8 @@ export const metricBehaviors: MetricBehaviors = {
     start: 13.4,
     trend: 'down',
   },
-  close_counter: { min: 0, max: 100, step: 1, start: 0, trend: 'up' },
-  close: { min: 0, max: 1, step: 1, start: 1 },
   humidity: { min: 20, max: 95, step: 0.1, start: 67 },
+  open: { min: 0, max: 1, step: 1, start: 1 },
   movement_counter: { min: 0, max: 254, step: 1, start: 0, trend: 'up' },
   sensor_battery_level: {
     min: 20,

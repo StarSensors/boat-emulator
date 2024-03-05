@@ -8,11 +8,12 @@ import { TbGateway } from './tb-gateway'
 
 import { assetProfiles } from './constants/asset-profiles'
 import { assets } from './constants/assets'
-import { customers } from './constants/customers'
+import { customerAlarmSettings, customers } from './constants/customers'
 import { dashboardMap } from './constants/dashboards'
 import { deviceProfiles } from './constants/device-profiles'
 import { devices } from './constants/devices'
 import { users } from './constants/users'
+import { TbEntityEnum, TbScopeEnum } from './tb-api/interfaces/enums'
 
 const logger = pino({
   level:
@@ -41,6 +42,7 @@ const boostrap = async () => {
         deviceProfile.name,
         deviceProfile.id,
         deviceProfile.description,
+        deviceProfile.alarms,
       ),
     ),
   )
@@ -81,6 +83,17 @@ const boostrap = async () => {
   const tbCustomers = await Promise.all(
     _.map(customers, customer => tenantApi.upsertCustomer(customer.title)),
   )
+
+  // set customer attributes
+  for (const tbCustomer of tbCustomers) {
+    const customerId = tbCustomer.id?.id || 'unknown'
+    await tenantApi.setEntityAttributes(
+      customerId,
+      customerAlarmSettings,
+      TbEntityEnum.CUSTOMER,
+      TbScopeEnum.SERVER_SCOPE,
+    )
+  }
 
   // assign assets to customer
   for (const customer of customers) {
@@ -176,6 +189,73 @@ const boostrap = async () => {
   const tbGatewayDevice = await tenantApi.upsertGatewayDevice(
     'Boat Emulator Gateway',
   )
+
+  // update or set getway device initial state
+  const state: {
+    [key: string]: {
+      current: { [key: string]: number }
+      target: { [key: string]: number }
+      targetEnabled: boolean
+    }
+  } = {}
+  for (const tbDevice of tBdevices) {
+    const deviceId = tbDevice.id?.id || 'unknown'
+
+    // get device attributes
+    const deviceAttrs = await tenantApi.getEntityAttributes(
+      deviceId,
+      TbEntityEnum.DEVICE,
+    )
+
+    // get target information from devices attributes
+    // target enabled
+    const targetEnabled =
+      !!_.find(deviceAttrs, { key: 'target_enabled' })?.value || false
+
+    const targetMap = _.chain(deviceAttrs)
+      .filter(
+        attr => attr.key.startsWith('target_') && attr.key !== 'target_enabled',
+      )
+      .map(attr => [attr.key.replace('target_', ''), attr.value])
+      .fromPairs()
+      .value()
+
+    // get latest timeseries data
+    const latestTimeseries = await tenantApi.getLatestTimeseries(deviceId)
+
+    // get map of latest timeseries values
+    const latestMap = _.mapValues(latestTimeseries, value => value?.value || 0)
+
+    // use target in preference to latest timeseries
+    const newAttrsMap = {
+      ..._.mapValues(latestMap, value => Math.round((value || 0) * 10) / 10), // rounded target values
+      ...targetMap,
+      enabled: targetEnabled,
+    }
+
+    // update target metric values in device attributes
+    const newAttributes = _.mapKeys(
+      newAttrsMap,
+      (value, metric) => `target_${metric}`,
+    )
+    await tenantApi.setEntityAttributes(
+      tbDevice.id?.id || 'unknown',
+      newAttributes,
+      TbEntityEnum.DEVICE,
+      TbScopeEnum.SHARED_SCOPE,
+    )
+
+    // set device latets timeseries
+    state[tbDevice.name] = {
+      current: latestMap,
+      target: targetMap,
+      targetEnabled,
+    }
+  }
+
+  // set the latest timeseries
+  // (else jumps in the graph will be seen when the gateway starts sending data)
+  tbGateway.setState(state)
 
   // start the gateway
   const accessToken = await tenantApi.getCachedDeviceAccessToken(
