@@ -8,7 +8,7 @@ export const deviceProfiles: DeviceProfile[] = [
     alarms: [
       {
         id: '7f8ff7d9-8272-602a-205c-926b5da90b72',
-        alarmType: 'Low temperature warning',
+        alarmType: 'Low temperature',
         createRules: {
           WARNING: {
             condition: {
@@ -108,7 +108,7 @@ export const deviceProfiles: DeviceProfile[] = [
       },
       {
         id: 'f612ed1b-e290-c312-c25d-39eb2856bd00',
-        alarmType: 'High temperature warning',
+        alarmType: 'High temperature',
         createRules: {
           WARNING: {
             condition: {
@@ -206,6 +206,162 @@ export const deviceProfiles: DeviceProfile[] = [
         propagateToTenant: false,
         propagateRelationTypes: null,
       },
+      {
+        id: 'a1235481-9a44-f980-8f18-15f45b41367d',
+        alarmType: 'High humidity',
+        createRules: {
+          CRITICAL: {
+            condition: {
+              condition: [
+                {
+                  key: {
+                    type: 'TIME_SERIES',
+                    key: 'humidity',
+                  },
+                  valueType: 'NUMERIC',
+                  value: null,
+                  predicate: {
+                    type: 'NUMERIC',
+                    operation: 'GREATER_OR_EQUAL',
+                    value: {
+                      defaultValue: 0,
+                      userValue: null,
+                      dynamicValue: {
+                        sourceType: 'CURRENT_DEVICE',
+                        sourceAttribute:
+                          'customer_alarm_humidity_high_critical_threshold',
+                        inherit: true,
+                      },
+                    },
+                  },
+                },
+                {
+                  key: {
+                    type: 'CONSTANT',
+                    key: 'customer_alarm_humidity_high_critical_enabled',
+                  },
+                  valueType: 'BOOLEAN',
+                  value: true,
+                  predicate: {
+                    type: 'BOOLEAN',
+                    operation: 'EQUAL',
+                    value: {
+                      defaultValue: false,
+                      userValue: null,
+                      dynamicValue: {
+                        sourceType: 'CURRENT_DEVICE',
+                        sourceAttribute:
+                          'customer_alarm_humidity_high_critical_enabled',
+                        inherit: true,
+                      },
+                    },
+                  },
+                },
+              ],
+              spec: {
+                type: 'SIMPLE',
+              },
+            },
+            schedule: null,
+            alarmDetails: null,
+            dashboardId: null,
+          },
+          WARNING: {
+            condition: {
+              condition: [
+                {
+                  key: {
+                    type: 'TIME_SERIES',
+                    key: 'humidity',
+                  },
+                  valueType: 'NUMERIC',
+                  value: null,
+                  predicate: {
+                    type: 'NUMERIC',
+                    operation: 'GREATER_OR_EQUAL',
+                    value: {
+                      defaultValue: 0,
+                      userValue: null,
+                      dynamicValue: {
+                        sourceType: 'CURRENT_DEVICE',
+                        sourceAttribute:
+                          'customer_alarm_humidity_high_warning_threshold',
+                        inherit: true,
+                      },
+                    },
+                  },
+                },
+                {
+                  key: {
+                    type: 'CONSTANT',
+                    key: 'customer_alarm_humidity_high_warning_enabled',
+                  },
+                  valueType: 'BOOLEAN',
+                  value: true,
+                  predicate: {
+                    type: 'BOOLEAN',
+                    operation: 'EQUAL',
+                    value: {
+                      defaultValue: false,
+                      userValue: null,
+                      dynamicValue: {
+                        sourceType: 'CURRENT_DEVICE',
+                        sourceAttribute:
+                          'customer_alarm_humidity_high_warning_enabled',
+                        inherit: true,
+                      },
+                    },
+                  },
+                },
+              ],
+              spec: {
+                type: 'SIMPLE',
+              },
+            },
+            schedule: null,
+            alarmDetails: null,
+            dashboardId: null,
+          },
+        },
+        clearRule: {
+          condition: {
+            condition: [
+              {
+                key: {
+                  type: 'TIME_SERIES',
+                  key: 'humidity',
+                },
+                valueType: 'NUMERIC',
+                value: null,
+                predicate: {
+                  type: 'NUMERIC',
+                  operation: 'LESS',
+                  value: {
+                    defaultValue: 0,
+                    userValue: null,
+                    dynamicValue: {
+                      sourceType: 'CURRENT_DEVICE',
+                      sourceAttribute:
+                        'customer_alarm_humidity_high_warning_threshold',
+                      inherit: true,
+                    },
+                  },
+                },
+              },
+            ],
+            spec: {
+              type: 'SIMPLE',
+            },
+          },
+          schedule: null,
+          alarmDetails: null,
+          dashboardId: null,
+        },
+        propagate: false,
+        propagateToOwner: false,
+        propagateToTenant: false,
+        propagateRelationTypes: null,
+      },
     ],
     metrics: [
       'sensor_battery_voltage',
@@ -222,7 +378,7 @@ export const deviceProfiles: DeviceProfile[] = [
     alarms: [
       {
         id: 'cbff758e-6d33-4fdd-b37e-b1e2ead6f226',
-        alarmType: 'Water warning',
+        alarmType: 'Water',
         createRules: {
           WARNING: {
             condition: {
@@ -320,7 +476,7 @@ export const deviceProfiles: DeviceProfile[] = [
     alarms: [
       {
         id: 'ba94564e-2a68-23d5-37b4-15401cbdad6f',
-        alarmType: 'Low battery warning',
+        alarmType: 'Low battery',
         createRules: {
           WARNING: {
             condition: {
@@ -486,7 +642,7 @@ export const deviceProfiles: DeviceProfile[] = [
     alarms: [
       {
         id: 'c7ebf904-04dd-42e2-a49c-ee5777c00a03',
-        alarmType: 'Low battery warning',
+        alarmType: 'Low battery',
         createRules: {
           WARNING: {
             condition: {
@@ -678,7 +834,7 @@ export const deviceProfiles: DeviceProfile[] = [
     alarms: [
       {
         id: 'a00dc6ff-3cdd-ecac-5c96-32c91a4364d7',
-        alarmType: 'Door open warning',
+        alarmType: 'Door open',
         createRules: {
           WARNING: {
             condition: {
