@@ -20,12 +20,12 @@ export const metricBehaviors: MetricBehaviors = {
     trend: 'down',
   },
   sensor_battery_voltage: {
-    min: 2.8,
-    max: 3.4,
+    min: 2.4,
+    max: 3.2,
     step: 0.001,
-    start: 3.4,
+    start: 3.2,
     trend: 'down',
   },
-  temperature: { min: -10, max: 50, step: 0.1, start: 20 },
+  temperature: { min: -10, max: 90, step: 0.2, start: 20 },
   water: { min: 0, max: 1, step: 1, start: 0 },
 }
