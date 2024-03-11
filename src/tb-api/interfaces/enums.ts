@@ -94,3 +94,8 @@ export enum TbRelationDirectionEnum {
   FROM = 'FROM',
   TO = 'TO',
 }
+
+export enum TbRuleChainTypeEnum {
+  CORE = 'CORE',
+  EDGE = 'EDGE',
+}
