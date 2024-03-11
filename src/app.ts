@@ -12,8 +12,10 @@ import { customerAlarmSettings, customers } from './constants/customers'
 import { dashboardMap } from './constants/dashboards'
 import { deviceProfiles } from './constants/device-profiles'
 import { devices } from './constants/devices'
-import { users } from './constants/users'
+import { ruleChainMetaData } from './constants/rule-chain-meta-data'
 import { TbEntityEnum, TbScopeEnum } from './tb-api/interfaces/enums'
+import { users } from './constants/users'
+import { TbRuleChain } from './tb-api/interfaces/rule-chains'
 
 const logger = pino({
   level:
@@ -35,17 +37,35 @@ const tbGateway = new TbGateway(config.mqtt.url, logger)
 const boostrap = async () => {
   await tenantApi.start()
 
+  // provision rule chains
+  const tbRuleChainMap: { [key: string]: TbRuleChain } = {
+    default: await tenantApi.getRootRuleChain(),
+  }
+  for (const { name, metadata } of ruleChainMetaData) {
+    tbRuleChainMap[name] = await tenantApi.upsertRuleChain(name, metadata)
+  }
+
   // provision device profiles
-  await Promise.all(
-    _.map(deviceProfiles, deviceProfile =>
-      tenantApi.upsertDeviceProfile(
-        deviceProfile.name,
-        deviceProfile.id,
-        deviceProfile.description,
-        deviceProfile.alarms,
-      ),
-    ),
-  )
+  for (const deviceProfile of deviceProfiles) {
+    // get device profile rule chain id
+    let tbRuleChain = tbRuleChainMap.default
+    if (deviceProfile.ruleChain) {
+      tbRuleChain = tbRuleChainMap[deviceProfile.ruleChain]
+      if (!tbRuleChain) {
+        throw new Error(
+          `Device profile ${deviceProfile.name}: Rule chain ${deviceProfile.ruleChain} not found`,
+        )
+      }
+    }
+
+    await tenantApi.upsertDeviceProfile(
+      deviceProfile.name,
+      deviceProfile.id,
+      deviceProfile.description || '',
+      deviceProfile.alarms,
+      tbRuleChain.id?.id || 'unknown',
+    )
+  }
 
   // provision devices
   const tBdevices = await Promise.all(
@@ -174,6 +194,8 @@ const boostrap = async () => {
         if (device) {
           // claim device
           await api.claimDevice(name, device.attributes.claimingData.secretKey)
+
+          // todo: regenerate customer dashboards
 
           // update the relation
           await api.assignDeviceToAsset(name, asset.name)

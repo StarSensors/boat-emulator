@@ -1,13 +1,14 @@
 export type TbClientType = 'customer' | 'tenant'
 
 export type TbApiEntity =
-  | 'asset'
   | 'asset-profile'
+  | 'asset'
   | 'customer'
   | 'dashboard'
-  | 'device'
   | 'device-profile'
+  | 'device'
   | 'relation'
+  | 'rule-chain'
   | 'user'
 
 export type TbApiOptions = {

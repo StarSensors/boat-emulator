@@ -9,7 +9,7 @@ import axios, {
 } from 'axios'
 import * as _ from 'lodash'
 import * as querystring from 'querystring'
-import { inspect } from 'util'
+// import { inspect } from 'util'
 
 // types
 import { TbClientType, TbApiEntity } from './types'
@@ -41,6 +41,9 @@ import { TbUser, TbUserActivationLink } from './interfaces/user'
 
 // constants
 import { URI_MAPPING } from './uri-mapping'
+import { TbRuleChain, TbRuleChainMetaData } from './interfaces/rule-chains'
+import { ArrayUniqueOptions } from 'joi'
+import { RuleChainMetaData } from '../types'
 
 export class TbApi {
   private readonly clientType: TbClientType
@@ -465,8 +468,9 @@ export class TbApi {
   async upsertDeviceProfile(
     name: string,
     externalId: string,
-    description?: string,
+    description: string,
     alarms: TbDeviceProfileAlarm[] = [],
+    tbRuleChainId: string,
   ): Promise<TbDeviceProfile> {
     const tbDeviceProfiles =
       await this.getEntities<TbDeviceProfile>('device-profile')
@@ -479,7 +483,8 @@ export class TbApi {
       if (
         tbDeviceProfile.description === description &&
         tbDeviceProfile.externalId?.id === externalId &&
-        _.isEqual(tbDeviceProfile.profileData.alarms, alarms)
+        _.isEqual(tbDeviceProfile.profileData.alarms, alarms) &&
+        tbDeviceProfile.defaultRuleChainId?.id === tbRuleChainId
       ) {
         this.logger.info(`Device profile ${name}: In sync`)
       } else {
@@ -498,11 +503,15 @@ export class TbApi {
 
         if (!_.isEqual(tbDeviceProfile.profileData.alarms, alarms)) {
           this.logger.info(`Device profile ${name}: Updating alarms`)
-
-          console.log('old', JSON.stringify(tbDeviceProfile.profileData.alarms))
-          console.log('new', JSON.stringify(alarms))
-
           tbDeviceProfile.profileData.alarms = alarms
+        }
+
+        if (tbDeviceProfile.defaultRuleChainId?.id !== tbRuleChainId) {
+          this.logger.info(`Device profile ${name}: Updating rule chain id`)
+          tbDeviceProfile.defaultRuleChainId = {
+            entityType: TbEntityEnum.RULE_CHAIN,
+            id: tbRuleChainId,
+          }
         }
 
         tbDeviceProfile = await this.upsertEntity<TbDeviceProfile>(
@@ -532,6 +541,10 @@ export class TbApi {
         externalId: {
           entityType: TbEntityEnum.DEVICE_PROFILE,
           id: externalId,
+        },
+        defaultRuleChainId: {
+          entityType: TbEntityEnum.RULE_CHAIN,
+          id: tbRuleChainId,
         },
       }
 
@@ -780,6 +793,103 @@ export class TbApi {
     }
 
     return tbUser
+  }
+
+  async getRootRuleChain(): Promise<TbRuleChain> {
+    const tbRuleChains = await this.getEntities<TbRuleChain>('rule-chain')
+    const rootRuleChain = _.find(tbRuleChains, {
+      name: 'Root Rule Chain',
+    }) as TbRuleChain
+
+    if (!rootRuleChain) {
+      throw new Error('Root rule chain not found')
+    }
+
+    return rootRuleChain
+  }
+
+  async getRuleChainMetaData(
+    ruleChainId: string,
+  ): Promise<TbRuleChainMetaData> {
+    const result = await this.api.get<TbRuleChainMetaData>(
+      `api/ruleChain/${ruleChainId}/metadata`,
+    )
+    return result.data
+  }
+
+  isTheSameRuleChainMetaData(
+    template: RuleChainMetaData,
+    metaData: TbRuleChainMetaData,
+  ): boolean {
+    const templateNodes = _.map(template.nodes, node =>
+      _.pick(node, ['type', 'name']),
+    )
+    const metaDataNodes = _.map(metaData.nodes, node =>
+      _.pick(node, ['type', 'name']),
+    )
+
+    if (_.isEqual(templateNodes, metaDataNodes)) {
+      const templateConnections = template.connections
+      const metaDataConnections = metaData.connections
+      if (_.isEqual(templateConnections, metaDataConnections)) {
+        if (template.firstNodeIndex === metaData.firstNodeIndex) {
+          return true
+        } else {
+          this.logger.warn('Metadata first node index is not equal to template')
+          return false
+        }
+      } else {
+        this.logger.warn('Metadata connections are not equal to template')
+        return false
+      }
+    } else {
+      this.logger.warn('Metadata nodes are not equal to template')
+      return false
+    }
+  }
+
+  async upsertRuleChain(
+    deviceProfileName: string,
+    template: RuleChainMetaData,
+  ): Promise<TbRuleChain> {
+    const tbRuleChains = await this.getEntities<TbRuleChain>('rule-chain')
+    let tbRuleChain = _.find(tbRuleChains, { name: deviceProfileName })
+
+    if (tbRuleChain) {
+      const tbRuleChainId = tbRuleChain.id?.id || 'unknown'
+      const tbRuleChainMetaData = await this.getRuleChainMetaData(tbRuleChainId)
+
+      if (this.isTheSameRuleChainMetaData(template, tbRuleChainMetaData)) {
+        this.logger.info(`Rule chain ${deviceProfileName}: In sync`)
+        return tbRuleChain
+      } else {
+        this.logger.info(`Rule chain ${deviceProfileName}: Updating metadata`)
+        await this.api.post<TbRuleChainMetaData>('api/ruleChain/metadata', {
+          ruleChainId: {
+            entityType: TbEntityEnum.RULE_CHAIN,
+            id: tbRuleChainId,
+          },
+          ...template,
+        })
+        return tbRuleChain
+      }
+    } else {
+      this.logger.info(
+        `Rule chain ${deviceProfileName}: Creating new rule chain.`,
+      )
+      tbRuleChain = await this.upsertEntity<TbRuleChain>('rule-chain', {
+        name: deviceProfileName,
+      })
+      this.logger.info(`Rule chain ${deviceProfileName}: Creating metadata`)
+      await this.api.post<TbRuleChainMetaData>('api/ruleChain/metadata', {
+        ruleChainId: {
+          entityType: TbEntityEnum.RULE_CHAIN,
+          id: tbRuleChain.id?.id || 'todo: this can not happen',
+        },
+        ...template,
+      })
+      return tbRuleChain
+    }
   }
 
   async upsertDashboard(dashboard: any): Promise<TbDashboardInfo> {
