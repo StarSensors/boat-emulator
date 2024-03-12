@@ -57,13 +57,14 @@ const boostrap = async () => {
         )
       }
     }
+    const tbRuleChainId = tbRuleChain.id?.id || 'unknown'
 
     await tenantApi.upsertDeviceProfile(
       deviceProfile.name,
       deviceProfile.id,
       deviceProfile.description || '',
       deviceProfile.alarms,
-      tbRuleChain.id?.id || 'unknown',
+      tbRuleChainId,
     )
   }
 

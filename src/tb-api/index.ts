@@ -42,7 +42,6 @@ import { TbUser, TbUserActivationLink } from './interfaces/user'
 // constants
 import { URI_MAPPING } from './uri-mapping'
 import { TbRuleChain, TbRuleChainMetaData } from './interfaces/rule-chains'
-import { ArrayUniqueOptions } from 'joi'
 import { RuleChainMetaData } from '../types'
 
 export class TbApi {
@@ -829,8 +828,14 @@ export class TbApi {
     )
 
     if (_.isEqual(templateNodes, metaDataNodes)) {
-      const templateConnections = template.connections
-      const metaDataConnections = metaData.connections
+      const templateConnections = _.sortBy(
+        template.connections,
+        c => c.fromIndex * c.toIndex,
+      )
+      const metaDataConnections = _.sortBy(
+        metaData.connections,
+        c => c.fromIndex * c.toIndex,
+      )
       if (_.isEqual(templateConnections, metaDataConnections)) {
         if (template.firstNodeIndex === metaData.firstNodeIndex) {
           return true
