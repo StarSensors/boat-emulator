@@ -1,0 +1,53 @@
+var levels = [
+  { voltage: 12.64, level: 100 },
+  { voltage: 12.53, level: 90 },
+  { voltage: 12.41, level: 80 },
+  { voltage: 12.29, level: 70 },
+  { voltage: 12.18, level: 60 },
+  { voltage: 12.07, level: 50 },
+  { voltage: 11.97, level: 40 },
+  { voltage: 11.87, level: 30 },
+  { voltage: 11.76, level: 20 },
+  { voltage: 11.63, level: 10 },
+  { voltage: 11.59, level: 0 },
+]
+
+function lerp(voltageReading) {
+  var maxVoltage = levels[0].voltage
+  var minVoltage = levels[levels.length - 1].voltage
+  var maxLevel = levels[0].level
+  var minLevel = levels[levels.length - 1].level
+
+  if (voltageReading >= maxVoltage) {
+    return maxLevel
+  }
+  if (voltageReading <= minVoltage) {
+    return minLevel
+  }
+
+  var index = 0
+  for (var i = 0; i < levels.length; i++) {
+    if (voltageReading > levels[i].voltage) {
+      index = i
+      break
+    }
+  }
+
+  var low = levels[index]
+  var high = levels[index - 1]
+  var range = high.voltage - low.voltage
+
+  return (
+    low.level +
+    ((voltageReading - low.voltage) / range) * (high.level - low.level)
+  )
+}
+
+if (
+  msg.battery_voltage !== null &&
+  typeof msg.battery_voltage !== 'undefined'
+) {
+  msg.battery_level = lerp(msg.battery_voltage)
+}
+
+return { msg: msg, metadata: metadata, msgType: msgType }
