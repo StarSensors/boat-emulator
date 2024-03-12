@@ -41,3 +41,16 @@ export type TbRelationsQuery = {
   filters?: TbRelationEntityTypeFilter[]
   parameters?: TbRelationsSearchParameters
 }
+
+export type TbEntityRelationsQuery = {
+  filters?: TbRelationEntityTypeFilter[]
+  parameters?: TbRelationsSearchParameters
+}
+
+export type TbEntityRelation = {
+  from?: TbEntityId
+  to?: TbEntityId
+  type?: string
+  typeGroup?: TbRelationTypeGroupEnum
+  additionalInfo?: object
+}

@@ -9,7 +9,7 @@ import axios, {
 } from 'axios'
 import * as _ from 'lodash'
 import * as querystring from 'querystring'
-// import { inspect } from 'util'
+import { inspect } from 'util'
 
 // types
 import { TbClientType, TbApiEntity } from './types'
@@ -22,6 +22,7 @@ import {
   TbAuthorityEnum,
   TbEntityEnum,
   TbProvisionTypeEnum,
+  TbRelationDirectionEnum,
   TbRelationTypeGroupEnum,
   TbScopeEnum,
   TbTransportEnum,
@@ -35,7 +36,11 @@ import {
   TbDeviceProfile,
   TbDeviceProfileAlarm,
 } from './interfaces/device-profile'
-import { TbRelation } from './interfaces/relation'
+import {
+  TbEntityRelationsQuery,
+  TbRelation,
+  TbEntityRelation,
+} from './interfaces/relation'
 import { TbTimeseriesData, TbTimeseriesValue } from './interfaces/telemetry'
 import { TbUser, TbUserActivationLink } from './interfaces/user'
 
@@ -1004,6 +1009,151 @@ export class TbApi {
     await this.api.post(`/api/customer/${customerId}/asset/${assetId}`)
   }
 
+  async relateAssetToCustomer(
+    assetName: string,
+    customerTitle: string,
+  ): Promise<TbRelation> {
+    this.logger.info(`Relating asset ${assetName} to asset ${customerTitle}`)
+
+    const tbAssetId = await this.getCachedAssetId(assetName)
+    const tbCustomerId = await this.getCachedCustomerId(customerTitle)
+
+    let tbRelation
+    try {
+      tbRelation = await this.getEntity<TbRelation>('relation', {
+        params: {
+          fromId: tbCustomerId,
+          fromType: TbEntityEnum.CUSTOMER,
+          toId: tbAssetId,
+          toType: TbEntityEnum.ASSET,
+          relationType: 'Owns',
+          relationTypeGroup: TbRelationTypeGroupEnum.COMMON,
+        },
+      })
+    } catch (error) {
+      if (isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          this.logger.info(
+            `Relation customer ${customerTitle} → asset ${assetName}: Does not exist yet`,
+          )
+        }
+      } else {
+        throw error
+      }
+    }
+
+    if (tbRelation) {
+      this.logger.warn(
+        `Relation customer ${customerTitle} → asset ${assetName}: Already exists`,
+      )
+      return tbRelation
+    }
+
+    return await this.upsertEntity<TbRelation>('relation', {
+      from: {
+        id: tbCustomerId,
+        entityType: TbEntityEnum.CUSTOMER,
+      },
+      to: {
+        id: tbAssetId,
+        entityType: TbEntityEnum.ASSET,
+      },
+      type: 'Owns',
+      typeGroup: TbRelationTypeGroupEnum.COMMON,
+      additionalInfo: {},
+    })
+  }
+
+  async findCustomerRelatedAssets(customerTitle: string): Promise<TbAsset[]> {
+    const customerId = await this.getCachedCustomerId(customerTitle)
+
+    const query: TbEntityRelationsQuery = {
+      parameters: {
+        rootId: customerId,
+        rootType: TbEntityEnum.CUSTOMER,
+        direction: TbRelationDirectionEnum.FROM,
+        relationTypeGroup: TbRelationTypeGroupEnum.COMMON,
+        fetchLastLevelOnly: false,
+      },
+      filters: [
+        {
+          relationType: 'Owns',
+          entityTypes: [TbEntityEnum.ASSET],
+        },
+      ],
+    }
+
+    const result = await this.api.post<TbEntityRelation[]>(
+      'api/relations',
+      query,
+    )
+
+    this.logger.info(
+      `Customer ${customerTitle}: Found ${result.data.length} assets`,
+    )
+
+    const assets: TbAsset[] = []
+    for (const tbEntityRelation of result.data) {
+      const asset = await this.getEntity<TbAsset>(
+        'asset',
+        {},
+        tbEntityRelation.to?.id,
+      )
+      if (!asset) {
+        throw new Error(
+          `Customer ${customerTitle}: Asset ${tbEntityRelation.to?.id} not found in asset list`,
+        )
+      }
+      assets.push(asset)
+    }
+
+    return assets
+  }
+
+  async findAssetRelatedDevices(assetName: string): Promise<TbDevice[]> {
+    const assetId = await this.getCachedAssetId(assetName)
+
+    const query: TbEntityRelationsQuery = {
+      parameters: {
+        rootId: assetId,
+        rootType: TbEntityEnum.ASSET,
+        direction: TbRelationDirectionEnum.FROM,
+        relationTypeGroup: TbRelationTypeGroupEnum.COMMON,
+        fetchLastLevelOnly: false,
+      },
+      filters: [
+        {
+          relationType: 'Contains',
+          entityTypes: [TbEntityEnum.DEVICE],
+        },
+      ],
+    }
+
+    const result = await this.api.post<TbEntityRelation[]>(
+      'api/relations',
+      query,
+    )
+
+    this.logger.info(`Asset ${assetName}: Found ${result.data.length} devices`)
+
+    const devices: TbDevice[] = []
+    for (const tbEntityRelation of result.data) {
+      const device = await this.getEntity<TbDevice>(
+        'device',
+        {},
+        tbEntityRelation.to?.id,
+      )
+      if (!device) {
+        throw new Error(
+          `Asset ${assetName}: Device ${tbEntityRelation.to?.id} not found in device list`,
+        )
+      }
+      devices.push(device)
+    }
+
+    return devices
+  }
+
   async claimDevice(deviceName: string, secretKey: string): Promise<void> {
     this.logger.info(`Claiming device ${deviceName}`)
 
@@ -1035,11 +1185,11 @@ export class TbApi {
     }
   }
 
-  async assignDeviceToAsset(
+  async relateDeviceToAsset(
     deviceName: string,
     assetName: string,
   ): Promise<TbRelation> {
-    this.logger.info(`Assigning device ${deviceName} to asset ${assetName}`)
+    this.logger.info(`Relating device ${deviceName} to asset ${assetName}`)
 
     const tbDevices = await this.getEntities<TbDevice>('device')
     const tbDevice = _.find(tbDevices, { name: deviceName }) as TbDevice

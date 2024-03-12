@@ -14,7 +14,7 @@ export const URI_MAPPING: Record<
     customer: {
       get: {
         single: {
-          byId: 'not-implemented', // api/asset/{entityId}
+          byId: 'api/asset/{entityId}', // api/asset/{entityId}
           byName: 'not-available',
         },
         many: 'api/customer/{customerId}/assets', // page
@@ -27,7 +27,7 @@ export const URI_MAPPING: Record<
     tenant: {
       get: {
         single: {
-          byId: 'not-implemented', // api/asset/{entityId}
+          byId: 'api/asset/{entityId}', // api/asset/{entityId}
           byName: 'not-implemented', // api/tenant/assets?assetName={assetName}
         },
         many: 'api/tenant/assets', // page
@@ -126,7 +126,7 @@ export const URI_MAPPING: Record<
     customer: {
       get: {
         single: {
-          byId: 'not-implemented', // api/device/{entityId}
+          byId: 'api/device/{entityId}', // api/device/{entityId}
           byName: 'not-available',
         },
         many: 'api/customer/{customerId}/devices', // page
@@ -139,7 +139,7 @@ export const URI_MAPPING: Record<
     tenant: {
       get: {
         single: {
-          byId: 'not-implemented', // api/device/{entityId}
+          byId: 'api/device/{entityId}', // api/device/{entityId}
           byName: 'not-implemented', // api/tenant/devices?deviceName={entityName}
         },
         many: 'api/tenant/devices', // page
