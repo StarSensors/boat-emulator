@@ -5,6 +5,13 @@ export const deviceProfiles: DeviceProfile[] = [
     id: 'ee3ce488-3b8b-422d-9a60-750eb358d000',
     name: 'Bridge Model 001',
     description: 'Bridge for IoT devices',
+    metrics: [
+      'sensor_battery_voltage',
+      'sensor_battery_level',
+      'temperature',
+      'humidity',
+    ],
+    type: 'bridge',
     alarms: [
       {
         id: '7f8ff7d9-8272-602a-205c-926b5da90b72',
@@ -363,18 +370,13 @@ export const deviceProfiles: DeviceProfile[] = [
         propagateRelationTypes: null,
       },
     ],
-    metrics: [
-      'sensor_battery_voltage',
-      'sensor_battery_level',
-      'temperature',
-      'humidity',
-    ],
-    type: 'bridge',
   },
   {
     id: 'ee3ce488-3b8b-422d-9a60-750eb358d001',
     name: 'Water Sensor Model 001',
     description: 'Water sensor for detecting water leaks',
+    metrics: ['sensor_battery_voltage', 'water'],
+    type: 'sensor',
     alarms: [
       {
         id: 'cbff758e-6d33-4fdd-b37e-b1e2ead6f226',
@@ -467,12 +469,14 @@ export const deviceProfiles: DeviceProfile[] = [
         propagateRelationTypes: null,
       },
     ],
-    metrics: ['sensor_battery_voltage', 'water'],
-    type: 'sensor',
   },
   {
     id: 'ee3ce488-3b8b-422d-9a60-750eb358d002',
     name: 'Battery Monitor Model 001',
+    description: 'Battery monitor for detecting battery voltage',
+    metrics: ['sensor_battery_voltage', 'battery_voltage'],
+    type: 'sensor',
+    ruleChain: 'Battery',
     alarms: [
       {
         id: 'ba94564e-2a68-23d5-37b4-15401cbdad6f',
@@ -631,14 +635,14 @@ export const deviceProfiles: DeviceProfile[] = [
         propagateRelationTypes: null,
       },
     ],
-    description: 'Battery monitor for detecting battery voltage',
-    metrics: ['sensor_battery_voltage', 'battery_voltage'],
-    type: 'sensor',
   },
   {
     id: 'ee3ce488-3b8b-422d-9a60-750eb358d003',
     name: 'Battery Monitor Model 002',
     description: 'Battery monitor for detecting battery voltage and level',
+    metrics: ['sensor_battery_voltage', 'battery_voltage', 'battery_level'],
+    type: 'sensor',
+    ruleChain: 'Battery',
     alarms: [
       {
         id: 'c7ebf904-04dd-42e2-a49c-ee5777c00a03',
@@ -797,12 +801,18 @@ export const deviceProfiles: DeviceProfile[] = [
         propagateRelationTypes: null,
       },
     ],
-    metrics: ['sensor_battery_voltage', 'battery_voltage', 'battery_level'],
-    type: 'sensor',
   },
   {
     id: 'ee3ce488-3b8b-422d-9a60-750eb358d004',
     name: 'Environmental Sensor Model 001',
+    description: 'Environmental sensor for detecting temperature and humidity',
+    metrics: [
+      'sensor_battery_voltage',
+      'sensor_battery_level',
+      'temperature',
+      'humidity',
+    ],
+    type: 'sensor',
     alarms: [
       {
         id: '277e2ccc-0c20-447a-a1a1-872fc8470620',
@@ -1161,20 +1171,19 @@ export const deviceProfiles: DeviceProfile[] = [
         propagateRelationTypes: null,
       },
     ],
-    description: 'Environmental sensor for detecting temperature and humidity',
-    metrics: [
-      'sensor_battery_voltage',
-      'sensor_battery_level',
-      'temperature',
-      'humidity',
-    ],
-    type: 'sensor',
   },
   {
     id: 'ee3ce488-3b8b-422d-9a60-750eb358d005',
     name: 'Environmental Sensor Model 002',
     description:
       'Environmental sensor for detecting temperature, humidity, and movement',
+    metrics: [
+      'sensor_battery_voltage',
+      'temperature',
+      'humidity',
+      'movement_counter',
+    ],
+    type: 'sensor',
     alarms: [
       {
         id: 'c6b8cd78-88f3-4b19-98ba-a11a05e6ae60',
@@ -1533,18 +1542,13 @@ export const deviceProfiles: DeviceProfile[] = [
         propagateRelationTypes: null,
       },
     ],
-    metrics: [
-      'sensor_battery_voltage',
-      'temperature',
-      'humidity',
-      'movement_counter',
-    ],
-    type: 'sensor',
   },
   {
     id: 'ee3ce488-3b8b-422d-9a60-750eb358d006',
     name: 'Hall Sensor Model 001',
     description: 'Hall sensor for detecting open and close events',
+    metrics: ['sensor_battery_voltage', 'open'],
+    type: 'sensor',
     alarms: [
       {
         id: 'a00dc6ff-3cdd-ecac-5c96-32c91a4364d7',
@@ -1637,7 +1641,5 @@ export const deviceProfiles: DeviceProfile[] = [
         propagateRelationTypes: null,
       },
     ],
-    metrics: ['sensor_battery_voltage', 'open'],
-    type: 'sensor',
   },
 ]

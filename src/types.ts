@@ -81,6 +81,7 @@ export type DeviceProfile = {
   alarms?: any[]
   metrics: Metric[]
   type: DeviceProfileType
+  ruleChain?: string
 }
 
 export type Device = {
@@ -136,4 +137,27 @@ export type User = {
   email: string
   password: string
   customer: Customer
+}
+
+export type RuleChainNodeConnectionInfo = {
+  fromIndex: number
+  toIndex: number
+  type: string
+}
+
+export type RuleChainRuleNode = {
+  type: string
+  name: string
+  configuration: object
+  additionalInfo: {
+    layoutX: number
+    layoutY: number
+    description?: string
+  }
+}
+
+export type RuleChainMetaData = {
+  nodes: RuleChainRuleNode[]
+  firstNodeIndex: number
+  connections: RuleChainNodeConnectionInfo[]
 }

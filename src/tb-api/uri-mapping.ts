@@ -206,6 +206,34 @@ export const URI_MAPPING: Record<
       },
     },
   },
+  'rule-chain': {
+    customer: {
+      get: {
+        single: {
+          byId: 'not-allowed',
+          byName: 'not-available',
+        },
+        many: 'not-allowed',
+      },
+      post: {
+        single: 'not-allowed',
+        many: 'not-allowed',
+      },
+    },
+    tenant: {
+      get: {
+        single: {
+          byId: 'api/ruleChain/{entityId}',
+          byName: 'not-available',
+        },
+        many: 'api/ruleChains',
+      },
+      post: {
+        single: 'api/ruleChain',
+        many: 'not-available',
+      },
+    },
+  },
   user: {
     customer: {
       get: {
