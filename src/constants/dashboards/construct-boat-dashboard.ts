@@ -1,7 +1,17 @@
-export {settings } from './settings'
-export {timewindow} from './timewindow'
-export {states} from './states'
-export {entityAliases} from './entity-aliases'
+import { timewindow, settings, states } from './boat-dashboard'
+
+type Boat = {
+  id: string
+  name: string
+  label: string
+}
+
+type BoatDashboardDevice = {
+  id: string
+  name: string
+  label: string
+  type: string
+}
 
 export const renderBoatDashboard = (
   boat: Boat,
@@ -16,7 +26,6 @@ export const renderBoatDashboard = (
     mobileHide: false,
     mobileOrder: null,
     configuration: {
-      entityAliases(boat),
       states: states(widgets),
       settings,
       timewindow,

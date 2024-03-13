@@ -1,15 +1,8 @@
 import _ from 'lodash'
 
-type Widget = {
-  id: string
-  type: string
-  title: string
-  sizeX: number
-  sizeY: number
-  index: number
-}
+import { BdbBoat, BdbWidget } from './types'
 
-export const states = (widgetList: Widget[]) => {
+export const states = (boat: BdbBoat, widgetList: BdbWidget[]) => {
   const widgets = _.chain(widgetList)
     .map((w, index) => ({ ...w, index }))
     .keyBy('id')
@@ -22,7 +15,7 @@ export const states = (widgetList: Widget[]) => {
 
   return {
     default: {
-      name: 'Tenant device controls',
+      name: boat.name,
       root: true,
       layouts: {
         main: {
