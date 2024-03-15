@@ -9,10 +9,10 @@ services:
       - '1883:1883'
     environment:
       TB_QUEUE_TYPE: in-memory
-    volumes:
-      - ./.data/mytb-data:/data
-      - ./.data/mytb-logs:/var/log/thingsboard
-      - ./logback.xml:/usr/share/thingsboard/conf/logback.xml
+    # volumes:
+    #   - ./.data/mytb-data:/data
+    #   - ./.data/mytb-logs:/var/log/thingsboard
+    #   - ./logback.xml:/usr/share/thingsboard/conf/logback.xml
 
   # boat-emulator:
   #   restart: always

@@ -1,17 +1,19 @@
 import _ from 'lodash'
 
-import { BdbBoat, BdbWidget } from './types'
+import { BdbBoat } from './types'
 
-export const states = (boat: BdbBoat, widgetList: BdbWidget[]) => {
-  const widgets = _.chain(widgetList)
-    .map((w, index) => ({ ...w, index }))
+export const states = (boat: BdbBoat, widgets: any[]) => {
+  const widgetMap = _.chain(widgets)
     .keyBy('id')
-    .mapValues(({ index, sizeX, sizeY }) => ({
-      sizeX,
-      sizeY,
-      row: 0,
-      col: index * 6,
-    }))
+    .mapValues(w => {
+      return {
+        sizeX: w.sizeX,
+        sizeY: w.sizeY,
+        row: w.row,
+        col: w.col,
+      }
+    })
+    .value()
 
   return {
     default: {
@@ -19,7 +21,7 @@ export const states = (boat: BdbBoat, widgetList: BdbWidget[]) => {
       root: true,
       layouts: {
         main: {
-          widgets,
+          widgets: widgetMap,
           gridSettings: {
             backgroundColor: '#eeeeee',
             columns: 24,

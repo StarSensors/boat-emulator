@@ -1,10 +1,16 @@
+import _ from 'lodash'
 import { v4 } from 'uuid'
 
-import { BdbBoat } from './types'
+import { BdbBoat, BdbDevice } from './types'
 
-export const entityAliases = (boat: BdbBoat) => {
+export const entityAliases = (boat: BdbBoat, devices: BdbDevice[]) => {
   const customerUuid = v4()
   const boatUuid = v4()
+
+  const deviceEntityAliases = _.chain(devices)
+    .map('entityAlias')
+    .keyBy('id')
+    .value()
 
   return {
     [customerUuid]: {
@@ -31,5 +37,6 @@ export const entityAliases = (boat: BdbBoat) => {
         },
       },
     },
+    ...deviceEntityAliases,
   }
 }
