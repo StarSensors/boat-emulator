@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { BdbBoat } from './types'
 
 export const states = (boat: BdbBoat, widgets: any[]) => {
+  console.log('states incoming widgets: ', widgets)
   const widgetMap = _.chain(widgets)
     .keyBy('id')
     .mapValues(w => {

@@ -3,8 +3,8 @@ import { v4 } from 'uuid'
 import { BdbDevice, BdbWidgetOptions } from '../types'
 
 export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
-  const sizeX = options.sizeX || 2.5
-  const sizeY = options.sizeY || 2.5
+  const sizeX = options.sizeX || 4
+  const sizeY = options.sizeY || 4
   const row = options.row || 0
   const col = options.col || 0
   const id = v4()
@@ -22,7 +22,7 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
         {
           type: 'entity',
           name: '',
-          entityAliasId: '83a99eb4-9817-9173-b66a-25b06465017f',
+          entityAliasId: device.entityAlias.id,
           dataKeys: [
             {
               name: 'battery_level',
@@ -32,7 +32,7 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
               settings: {},
               _hash: 0.3418360618846006,
               aggregationType: 'NONE',
-              units: 'V',
+              units: '%',
               decimals: 1,
               funcBody: null,
               usePostProcessing: null,

@@ -4,15 +4,13 @@ export type BdbBoat = {
   label: string
 }
 
-type BdbDeviceTypes = 'Battery Monitor Model 001' | 'Battery Monitor Model 002'
-
 export type BdbDevice = {
   id: string
   name: string
   label: string
-  type: BdbDeviceTypes
-  kind: string
-  widgets: any[]
+  type: string
+  kind?: string
+  widgets?: any[]
   entityAlias?: any
 }
 

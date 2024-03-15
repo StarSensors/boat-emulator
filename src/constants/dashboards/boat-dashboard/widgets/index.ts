@@ -1,8 +1,10 @@
 import { BdbDevice, BdbWidgetOptions } from '../types'
 import { battery_level } from './battery_level'
+import { battery_voltage } from './battery_voltage'
 
 export const widgetMap: { [key: string]: any } = {
   battery_level,
+  battery_voltage,
 }
 
 export const renderWidget = (
