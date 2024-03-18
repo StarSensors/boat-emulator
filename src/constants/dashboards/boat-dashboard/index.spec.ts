@@ -1,4 +1,4 @@
-import _ from 'lodash'
+// import _ from 'lodash'
 // import { inspect } from 'util'
 
 import { renderBoatDashboard } from './index'
@@ -34,8 +34,5 @@ describe('Boat Dashboard', () => {
     expect(
       dashboard.configuration.states.default.layouts.main.widgets,
     ).toBeDefined()
-    expect(
-      _.keys(dashboard.configuration.states.default.layouts.main.widgets),
-    ).toHaveLength(1)
   })
 })

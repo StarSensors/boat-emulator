@@ -1,14 +1,14 @@
 import pino from 'pino'
 import { v4 } from 'uuid'
+import _ from 'lodash'
 
 import { settings } from './settings'
 import { timewindow } from './timewindow'
 import { states } from './states'
-import { entityAliases } from './entity-aliases'
-import { renderWidget } from './widgets'
+import { renderEntityAliases } from './entity-aliases'
+import { renderDeviceWidget, renderBoatWidget } from './widgets'
 
 import { BdbBoat, BdbDevice } from './types'
-import _ from 'lodash'
 
 const logger = pino({
   level:
@@ -21,17 +21,25 @@ const logger = pino({
       : undefined,
 })
 
-const setDeviceKind = (device: BdbDevice) => {
-  if (device.type.startsWith('Battery')) {
-    device.kind = 'battery'
+const setDeviceKindAndSort = (device: BdbDevice) => {
+  if (device.type.startsWith('Bridge')) {
+    device.kind = 'Bridge'
+    device.sort = '000'
+  } else if (device.type.startsWith('Battery')) {
+    device.kind = 'Battery sensor'
+    device.sort = '020'
   } else if (device.type.startsWith('Environment')) {
-    device.kind = 'environment'
+    device.kind = 'Environment sensor'
+    device.sort = '010'
   } else if (device.type.startsWith('Water')) {
-    device.kind = 'water'
+    device.kind = 'Water sensor'
+    device.sort = '030'
   } else if (device.type.startsWith('Door')) {
-    device.kind = 'door'
+    device.kind = 'Door sensor'
+    device.sort = '040'
   } else if (device.type.startsWith('Hall')) {
-    device.kind = 'door'
+    device.kind = 'Door sensor'
+    device.sort = '040'
   } else {
     logger.warn(`Unsupported device type: ${device.type}`)
   }
@@ -52,44 +60,99 @@ const setDeviceEntityAlias = (device: BdbDevice) => {
   }
 }
 
-const setDeviceWidgets = (device: BdbDevice, index: number) => {
-  if (!device.widgets) {
-    device.widgets = []
-  }
+const setDeviceWidgets =
+  (rowStart: number) => (device: BdbDevice, index: number) => {
+    if (!device.widgets) {
+      device.widgets = []
+    }
 
-  switch (device.type) {
-    case 'Battery Monitor Model 001':
-    case 'Battery Monitor Model 002':
-      device.widgets.push(renderWidget('battery_level', device))
-      device.widgets.push(renderWidget('battery_voltage', device))
-      break
-    default:
-      logger.warn(`No widgets for device type: ${device.type}`)
-      return
-  }
+    const row = rowStart + index * 4
 
-  const count = 0
-  for (const widget of device.widgets) {
-    widget.row = index * 4
-    widget.col = count * 4
-
-    Math.ceil(_.reduce(device.widgets, (sum, w) => sum + w.sizeX, 0))
+    switch (device.kind) {
+      case 'Battery sensor':
+        device.widgets.push(
+          renderDeviceWidget('battery_level', device, { row, col: 0 }),
+        )
+        device.widgets.push(
+          renderDeviceWidget('battery_voltage', device, { row, col: 8 }),
+        )
+        break
+      case 'Environment sensor':
+        device.widgets.push(
+          renderDeviceWidget('temperature', device, { row, col: 0 }),
+        )
+        device.widgets.push(
+          renderDeviceWidget('humidity', device, { row, col: 8 }),
+        )
+        break
+      case 'Bridge':
+        device.widgets.push(
+          renderDeviceWidget('temperature', device, { row, col: 0 }),
+        )
+        device.widgets.push(
+          renderDeviceWidget('humidity', device, { row, col: 8 }),
+        )
+        break
+      default:
+        logger.warn(`No widgets for device kind: ${device.kind}`)
+        return
+    }
   }
-}
 
 export const renderBoatDashboard = (
   boat: BdbBoat,
   devices: BdbDevice[],
 ): any => {
+  const widgetRowStart = 2
   _.chain(devices)
-    .each(setDeviceKind)
-    .sortBy('kind')
+    .each(setDeviceKindAndSort)
+    .sortBy(d => `${d.sort}-${d.kind}-${d.label}`)
     .each(setDeviceEntityAlias)
-    .each(setDeviceWidgets)
+    .each(setDeviceWidgets(widgetRowStart))
     .value()
+  const entityAliases = renderEntityAliases(boat, devices)
+  const boatEntityAlias = _.find(entityAliases, { alias: 'Boat' })
+  if (!boatEntityAlias) {
+    throw new Error('Boat entity alias not found')
+  }
+  boat.entityAlias = boatEntityAlias
 
-  const allDeviceWidgets = _.chain(devices).flatMap('widgets').compact().value()
-  const widgetMap = _.keyBy(allDeviceWidgets, 'id')
+  const boatWidgets = [
+    renderBoatWidget('alarm_count', boat, {
+      row: 0,
+      col: 0,
+      sizeX: 8,
+      sizeY: 2,
+      config: { severityList: ['WARNING'] },
+    }),
+    renderBoatWidget('alarm_count', boat, {
+      row: 0,
+      col: 8,
+      sizeX: 8,
+      sizeY: 2,
+      config: { severityList: ['CRITICAL'] },
+    }),
+  ]
+
+  const deviceWidgets = _.chain(devices).flatMap('widgets').compact().value()
+  const alarmsTableWidgets = [
+    renderBoatWidget('alarms_table', boat, {
+      row:
+        widgetRowStart +
+        _.reduce(
+          devices,
+          (sum, d) => sum + (d.widgets?.length ? d.widgets[0].sizeY : 0),
+          0,
+        ),
+      col: 0,
+      sizeX: 16,
+      sizeY: 10,
+    }),
+  ]
+
+  const boatWidgetsMap = _.keyBy(boatWidgets, 'id')
+  const deviceWidgetsMap = _.keyBy(deviceWidgets, 'id')
+  const alarmsTableWidgetsMap = _.keyBy(alarmsTableWidgets, 'id')
 
   return {
     title: boat.label,
@@ -99,9 +162,17 @@ export const renderBoatDashboard = (
     mobileOrder: null,
     configuration: {
       description: '',
-      widgets: widgetMap,
-      entityAliases: entityAliases(boat, devices),
-      states: states(boat, allDeviceWidgets),
+      widgets: {
+        ...boatWidgetsMap,
+        ...deviceWidgetsMap,
+        ...alarmsTableWidgetsMap,
+      },
+      entityAliases,
+      states: states(boat, [
+        ...boatWidgets,
+        ...deviceWidgets,
+        ...alarmsTableWidgets,
+      ]),
       settings,
       timewindow,
       filters: {},

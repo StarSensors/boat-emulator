@@ -6,7 +6,7 @@ export const battery_voltage = (
   device: BdbDevice,
   options: BdbWidgetOptions,
 ) => {
-  const sizeX = options.sizeX || 4
+  const sizeX = options.sizeX || 8
   const sizeY = options.sizeY || 4
   const row = options.row || 0
   const col = options.col || 0
@@ -74,8 +74,8 @@ export const battery_voltage = (
         ticksAngle: 270,
         needleCircleSize: 10,
         defaultColor: '#e65100',
-        minValue: 0,
-        maxValue: 16,
+        minValue: 10,
+        maxValue: 15,
         majorTicksCount: null,
         colorMajorTicks: '#444',
         minorTicks: 10,
@@ -89,7 +89,7 @@ export const battery_voltage = (
         },
         numbersColor: '#616161',
         showUnitTitle: true,
-        unitTitle: 'Voltage',
+        unitTitle: device.label,
         titleFont: {
           family: 'Roboto',
           size: 24,
@@ -145,7 +145,7 @@ export const battery_voltage = (
       widgetStyle: {},
       widgetCss: '',
       pageSize: 1024,
-      decimals: 0,
+      decimals: 2,
       noDataDisplayMessage: '',
       configMode: 'advanced',
       useDashboardTimewindow: true,

@@ -1,14 +1,36 @@
 import _ from 'lodash'
 import { v4 } from 'uuid'
+import pluralize from 'pluralize'
+// import { inspect } from 'util'
 
 import { BdbBoat, BdbDevice } from './types'
 
-export const entityAliases = (boat: BdbBoat, devices: BdbDevice[]) => {
+const capitalize = (string: string): string => {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export const renderEntityAliases = (boat: BdbBoat, devices: BdbDevice[]) => {
   const customerUuid = v4()
   const boatUuid = v4()
 
   const deviceEntityAliases = _.chain(devices)
     .map('entityAlias')
+    .keyBy('id')
+    .value()
+
+  const deviceTypeEntityAliases = _.chain(devices)
+    .groupBy('kind')
+    .map((devices, kind) => {
+      return {
+        id: v4(),
+        alias: capitalize(pluralize(kind)),
+        filter: {
+          type: 'deviceType',
+          resolveMultiple: true,
+          deviceTypes: devices.map(device => device.type),
+        },
+      }
+    })
     .keyBy('id')
     .value()
 
@@ -21,7 +43,7 @@ export const entityAliases = (boat: BdbBoat, devices: BdbDevice[]) => {
         resolveMultiple: false,
         singleEntity: {
           entityType: 'CURRENT_CUSTOMER',
-          id: '462d2a50-e073-11ee-9e60-2bce6b2714af',
+          id: '13814000-1dd2-11b2-8080-808080808080',
         },
       },
     },
@@ -37,6 +59,7 @@ export const entityAliases = (boat: BdbBoat, devices: BdbDevice[]) => {
         },
       },
     },
+    ...deviceTypeEntityAliases,
     ...deviceEntityAliases,
   }
 }

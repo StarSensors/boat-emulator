@@ -2,6 +2,7 @@ export type BdbBoat = {
   id: string
   name: string
   label: string
+  entityAlias?: any
 }
 
 export type BdbDevice = {
@@ -10,6 +11,7 @@ export type BdbDevice = {
   label: string
   type: string
   kind?: string
+  sort?: string
   widgets?: any[]
   entityAlias?: any
 }
@@ -19,4 +21,5 @@ export type BdbWidgetOptions = {
   sizeY?: number
   row?: number
   col?: number
+  config?: any
 }

@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { BdbBoat } from './types'
 
 export const states = (boat: BdbBoat, widgets: any[]) => {
-  console.log('states incoming widgets: ', widgets)
+  // console.log('states incoming widgets: ', widgets)
   const widgetMap = _.chain(widgets)
     .keyBy('id')
     .mapValues(w => {
@@ -18,7 +18,7 @@ export const states = (boat: BdbBoat, widgets: any[]) => {
 
   return {
     default: {
-      name: boat.name,
+      name: boat.label,
       root: true,
       layouts: {
         main: {

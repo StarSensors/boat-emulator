@@ -2,7 +2,7 @@ import { v4 } from 'uuid'
 
 import { BdbDevice, BdbWidgetOptions } from '../types'
 
-export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
+export const humidity = (device: BdbDevice, options: BdbWidgetOptions) => {
   const sizeX = options.sizeX || 8
   const sizeY = options.sizeY || 4
   const row = options.row || 0
@@ -11,7 +11,7 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
 
   return {
     id,
-    typeFullFqn: 'system.battery_level',
+    typeFullFqn: 'system.indoor_humidity_card',
     type: 'latest',
     sizeX,
     sizeY,
@@ -25,18 +25,12 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
           entityAliasId: device.entityAlias.id,
           dataKeys: [
             {
-              name: 'battery_level',
+              name: 'humidity',
               type: 'timeseries',
-              label: 'Level',
+              label: 'Humidity',
               color: '#2196f3',
               settings: {},
-              _hash: 0.3418360618846006,
-              aggregationType: 'NONE',
-              units: '%',
-              decimals: 1,
-              funcBody: null,
-              usePostProcessing: null,
-              postFuncBody: null,
+              _hash: 0.2890838239489557,
             },
           ],
           alarmFilterConfig: {
@@ -68,11 +62,103 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
           limit: 25000,
         },
       },
-      showTitle: true,
+      showTitle: false,
       backgroundColor: 'rgba(0, 0, 0, 0)',
       color: 'rgba(0, 0, 0, 0.87)',
       padding: '0px',
       settings: {
+        labelPosition: 'top',
+        layout: 'square',
+        showLabel: true,
+        labelFont: {
+          family: 'Roboto',
+          size: 16,
+          sizeUnit: 'px',
+          style: 'normal',
+          weight: '500',
+        },
+        labelColor: {
+          type: 'constant',
+          color: 'rgba(0, 0, 0, 0.87)',
+          colorFunction:
+            'var humidity = value;\nif (typeof humidity !== undefined) {\n  var percent = (humidity + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
+        },
+        showIcon: true,
+        iconSize: 40,
+        iconSizeUnit: 'px',
+        icon: 'mdi:water-percent',
+        iconColor: {
+          type: 'constant',
+          color: 'rgba(0, 78, 121, 0.87)',
+          rangeList: [
+            {
+              from: null,
+              to: 70,
+              color: '#4CAF50',
+            },
+            {
+              from: 30,
+              to: 80,
+              color: '#E89623',
+            },
+            {
+              from: 60,
+              to: null,
+              color: '#D81838',
+            },
+          ],
+          colorFunction:
+            'var humidity = value;\nif (typeof humidity !== undefined) {\n  var percent = (humidity + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
+        },
+        valueFont: {
+          family: 'Roboto',
+          size: 52,
+          sizeUnit: 'px',
+          style: 'normal',
+          weight: '500',
+        },
+        valueColor: {
+          type: 'range',
+          color: 'rgba(0, 0, 0, 0.87)',
+          colorFunction:
+            'var humidity = value;\nif (typeof humidity !== undefined) {\n  var percent = (humidity + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
+          rangeList: [
+            {
+              from: null,
+              to: 70,
+              color: '#4CAF50',
+            },
+            {
+              from: 30,
+              to: 80,
+              color: '#E89623',
+            },
+            {
+              from: 60,
+              to: null,
+              color: '#D81838',
+            },
+          ],
+        },
+        showDate: true,
+        dateFormat: {
+          format: null,
+          lastUpdateAgo: true,
+          custom: false,
+        },
+        dateFont: {
+          family: 'Roboto',
+          size: 12,
+          sizeUnit: 'px',
+          style: 'normal',
+          weight: '500',
+        },
+        dateColor: {
+          type: 'constant',
+          color: 'rgba(0, 0, 0, 0.38)',
+          colorFunction:
+            'var humidity = value;\nif (typeof humidity !== undefined) {\n  var percent = (humidity + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
+        },
         background: {
           type: 'color',
           color: '#fff',
@@ -82,72 +168,9 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
             blur: 3,
           },
         },
-        layout: 'vertical_solid',
-        showValue: true,
-        autoScaleValueSize: true,
-        valueFont: {
-          family: 'Roboto',
-          size: 20,
-          sizeUnit: 'px',
-          style: 'normal',
-          weight: '500',
-          lineHeight: '24px',
-        },
-        valueColor: {
-          type: 'constant',
-          color: 'rgba(0, 0, 0, 0.87)',
-          colorFunction:
-            'var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
-        },
-        batteryLevelColor: {
-          type: 'range',
-          color: 'rgb(224, 224, 224)',
-          rangeList: [
-            {
-              from: null,
-              to: 25,
-              color: 'rgba(227, 71, 71, 1)',
-            },
-            {
-              from: 25,
-              to: 50,
-              color: 'rgba(246, 206, 67, 1)',
-            },
-            {
-              from: 50,
-              to: null,
-              color: 'rgba(92, 223, 144, 1)',
-            },
-          ],
-          colorFunction:
-            'var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
-        },
-        batteryShapeColor: {
-          type: 'range',
-          color: 'rgba(224, 224, 224, 0.32)',
-          rangeList: [
-            {
-              from: null,
-              to: 25,
-              color: 'rgba(227, 71, 71, 0.32)',
-            },
-            {
-              from: 25,
-              to: 50,
-              color: 'rgba(246, 206, 67, 0.32)',
-            },
-            {
-              from: 50,
-              to: null,
-              color: 'rgba(92, 223, 144, 0.32)',
-            },
-          ],
-          colorFunction:
-            'var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
-        },
-        sectionsCount: 4,
+        autoScale: true,
       },
-      title: device.label,
+      title: 'Humidity card',
       dropShadow: true,
       enableFullscreen: false,
       titleStyle: {
@@ -170,16 +193,16 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
       showTitleIcon: false,
       titleTooltip: '',
       titleFont: {
-        size: 16,
+        size: 12,
         sizeUnit: 'px',
-        family: 'Roboto',
-        weight: '500',
-        style: 'normal',
-        lineHeight: '24px',
+        family: null,
+        weight: null,
+        style: null,
+        lineHeight: '1.6',
       },
-      titleIcon: 'mdi:battery-high',
+      titleIcon: '',
       iconColor: 'rgba(0, 0, 0, 0.87)',
-      iconSize: '18px',
+      iconSize: '14px',
       timewindowStyle: {
         showIcon: true,
         iconSize: '14px',
@@ -195,7 +218,6 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
         },
         color: null,
       },
-      titleColor: 'rgba(0, 0, 0, 0.87)',
     },
   }
 }

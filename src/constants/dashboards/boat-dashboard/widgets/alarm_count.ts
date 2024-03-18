@@ -1,17 +1,39 @@
 import { v4 } from 'uuid'
+import pluralize from 'pluralize'
+import _ from 'lodash'
 
-import { BdbDevice, BdbWidgetOptions } from '../types'
+import { BdbBoat, BdbWidgetOptions } from '../types'
 
-export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
+const capitalize = (string: string): string => {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export const alarm_count = (asset: BdbBoat, options: BdbWidgetOptions) => {
   const sizeX = options.sizeX || 8
-  const sizeY = options.sizeY || 4
+  const sizeY = options.sizeY || 2
   const row = options.row || 0
   const col = options.col || 0
   const id = v4()
 
+  let severityList = ['WARNING']
+  if (options.config?.severityList) {
+    severityList = options.config?.severityList
+  }
+
+  const label = _.chain(severityList)
+    .map(severity => pluralize(severity.toLowerCase()))
+    .map(capitalize)
+    .join(' & ')
+    .value()
+
+  let severityColor = 'rgba(232, 150, 35, 1)'
+  if (severityList[0] === 'CRITICAL') {
+    severityColor = 'rgba(244, 67, 54, 1)'
+  }
+
   return {
     id,
-    typeFullFqn: 'system.battery_level',
+    typeFullFqn: 'system.alarm_count',
     type: 'latest',
     sizeX,
     sizeY,
@@ -20,27 +42,22 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
     config: {
       datasources: [
         {
-          type: 'entity',
+          type: 'alarmCount',
           name: '',
-          entityAliasId: device.entityAlias.id,
           dataKeys: [
             {
-              name: 'battery_level',
-              type: 'timeseries',
-              label: 'Level',
-              color: '#2196f3',
+              name: 'count',
+              type: 'count',
+              label: 'count',
               settings: {},
-              _hash: 0.3418360618846006,
-              aggregationType: 'NONE',
-              units: '%',
-              decimals: 1,
-              funcBody: null,
-              usePostProcessing: null,
-              postFuncBody: null,
+              _hash: 0.7622124184804298,
             },
           ],
           alarmFilterConfig: {
             statusList: ['ACTIVE'],
+            severityList,
+            assignedToCurrentUser: false,
+            assigneeId: null,
           },
         },
       ],
@@ -58,8 +75,8 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
           interval: 1000,
           timewindowMs: 60000,
           fixedTimewindow: {
-            startTimeMs: 1710256758703,
-            endTimeMs: 1710343158703,
+            startTimeMs: 1702410876410,
+            endTimeMs: 1702497276410,
           },
           quickInterval: 'CURRENT_DAY',
         },
@@ -68,23 +85,58 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
           limit: 25000,
         },
       },
-      showTitle: true,
-      backgroundColor: 'rgba(0, 0, 0, 0)',
+      showTitle: false,
+      backgroundColor: 'rgb(255, 255, 255)',
       color: 'rgba(0, 0, 0, 0.87)',
       padding: '0px',
       settings: {
-        background: {
-          type: 'color',
-          color: '#fff',
-          overlay: {
-            enabled: false,
-            color: 'rgba(255,255,255,0.72)',
-            blur: 3,
-          },
+        showLabel: true,
+        label,
+        labelFont: {
+          family: 'Roboto',
+          size: 12,
+          sizeUnit: 'px',
+          style: 'normal',
+          weight: '400',
+          lineHeight: '16px',
         },
-        layout: 'vertical_solid',
-        showValue: true,
-        autoScaleValueSize: true,
+        labelColor: {
+          type: 'constant',
+          color: 'rgba(0, 0, 0, 0.54)',
+          colorFunction:
+            'var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
+        },
+        showIcon: true,
+        iconSize: 20,
+        iconSizeUnit: 'px',
+        icon: 'warning',
+        iconColor: {
+          type: 'constant',
+          color: 'rgba(255, 255, 255, 1)',
+          colorFunction:
+            'var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
+        },
+        showIconBackground: true,
+        iconBackgroundSize: 36,
+        iconBackgroundSizeUnit: 'px',
+        iconBackgroundColor: {
+          type: 'range',
+          color: 'rgba(0, 105, 92, 1)',
+          rangeList: [
+            {
+              from: 0,
+              to: 0,
+              color: 'rgba(76, 175, 90, 1)',
+            },
+            {
+              from: 1,
+              to: null,
+              color: severityColor,
+            },
+          ],
+          colorFunction:
+            'var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
+        },
         valueFont: {
           family: 'Roboto',
           size: 20,
@@ -99,63 +151,22 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
           colorFunction:
             'var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
         },
-        batteryLevelColor: {
-          type: 'range',
-          color: 'rgb(224, 224, 224)',
-          rangeList: [
-            {
-              from: null,
-              to: 25,
-              color: 'rgba(227, 71, 71, 1)',
-            },
-            {
-              from: 25,
-              to: 50,
-              color: 'rgba(246, 206, 67, 1)',
-            },
-            {
-              from: 50,
-              to: null,
-              color: 'rgba(92, 223, 144, 1)',
-            },
-          ],
-          colorFunction:
-            'var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
-        },
-        batteryShapeColor: {
-          type: 'range',
-          color: 'rgba(224, 224, 224, 0.32)',
-          rangeList: [
-            {
-              from: null,
-              to: 25,
-              color: 'rgba(227, 71, 71, 0.32)',
-            },
-            {
-              from: 25,
-              to: 50,
-              color: 'rgba(246, 206, 67, 0.32)',
-            },
-            {
-              from: 50,
-              to: null,
-              color: 'rgba(92, 223, 144, 0.32)',
-            },
-          ],
-          colorFunction:
-            'var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',
-        },
-        sectionsCount: 4,
+        showChevron: false,
+        chevronSize: 24,
+        chevronSizeUnit: 'px',
+        chevronColor: 'rgba(0, 0, 0, 0.38)',
+        layout: 'column',
+        autoScale: true,
       },
-      title: device.label,
+      title: 'Alarm count',
       dropShadow: true,
       enableFullscreen: false,
       titleStyle: {
         fontSize: '16px',
         fontWeight: 400,
       },
-      units: '%',
-      decimals: 1,
+      units: '',
+      decimals: null,
       useDashboardTimewindow: true,
       showLegend: false,
       widgetStyle: {},
@@ -170,16 +181,16 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
       showTitleIcon: false,
       titleTooltip: '',
       titleFont: {
-        size: 16,
+        size: 12,
         sizeUnit: 'px',
-        family: 'Roboto',
-        weight: '500',
-        style: 'normal',
-        lineHeight: '24px',
+        family: null,
+        weight: null,
+        style: null,
+        lineHeight: '1',
       },
-      titleIcon: 'mdi:battery-high',
+      titleIcon: '',
       iconColor: 'rgba(0, 0, 0, 0.87)',
-      iconSize: '18px',
+      iconSize: '14px',
       timewindowStyle: {
         showIcon: true,
         iconSize: '14px',
@@ -195,7 +206,7 @@ export const battery_level = (device: BdbDevice, options: BdbWidgetOptions) => {
         },
         color: null,
       },
-      titleColor: 'rgba(0, 0, 0, 0.87)',
+      titleColor: 'rgba(0, 0, 0, 0.54)',
     },
   }
 }
