@@ -14,6 +14,7 @@ export type BdbDevice = {
   sort?: string
   widgets?: any[]
   entityAlias?: any
+  config?: any
 }
 
 export type BdbWidgetOptions = {

@@ -118,7 +118,8 @@ export const humidity = (device: BdbDevice, options: BdbWidgetOptions) => {
           weight: '500',
         },
         valueColor: {
-          type: 'range',
+          // type: 'range',
+          type: 'constant',
           color: 'rgba(0, 0, 0, 0.87)',
           colorFunction:
             'var humidity = value;\nif (typeof humidity !== undefined) {\n  var percent = (humidity + 60)/120 * 100;\n  return tinycolor.mix("blue", "red", percent).toHexString();\n}\nreturn "blue";',

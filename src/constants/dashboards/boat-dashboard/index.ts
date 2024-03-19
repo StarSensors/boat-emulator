@@ -1,6 +1,7 @@
 import pino from 'pino'
 import { v4 } from 'uuid'
 import _ from 'lodash'
+import { inspect } from 'util'
 
 import { settings } from './settings'
 import { timewindow } from './timewindow'
@@ -23,7 +24,7 @@ const logger = pino({
 
 const setDeviceKindAndSort = (device: BdbDevice) => {
   if (device.type.startsWith('Bridge')) {
-    device.kind = 'Bridge'
+    device.kind = 'Environment sensor'
     device.sort = '000'
   } else if (device.type.startsWith('Battery')) {
     device.kind = 'Battery sensor'
@@ -76,6 +77,13 @@ const setDeviceWidgets =
         device.widgets.push(
           renderDeviceWidget('battery_voltage', device, { row, col: 8 }),
         )
+        device.widgets.push(
+          renderDeviceWidget('basic_timeseries', device, {
+            row,
+            col: 16,
+            config: { dataKeys: ['battery_level', 'battery_voltage'] },
+          }),
+        )
         break
       case 'Environment sensor':
         device.widgets.push(
@@ -83,6 +91,13 @@ const setDeviceWidgets =
         )
         device.widgets.push(
           renderDeviceWidget('humidity', device, { row, col: 8 }),
+        )
+        device.widgets.push(
+          renderDeviceWidget('basic_timeseries', device, {
+            row,
+            col: 16,
+            config: { dataKeys: ['temperature', 'humidity'] },
+          }),
         )
         break
       case 'Bridge':
