@@ -1,6 +1,6 @@
 import { v4 } from 'uuid'
 // import pluralize from 'pluralize'
-import _ from 'lodash'
+// import _ from 'lodash'
 
 import { BdbBoat, BdbWidgetOptions } from '../types'
 
