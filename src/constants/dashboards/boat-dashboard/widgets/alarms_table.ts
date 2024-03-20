@@ -1,12 +1,12 @@
 import { v4 } from 'uuid'
-import pluralize from 'pluralize'
+// import pluralize from 'pluralize'
 import _ from 'lodash'
 
 import { BdbBoat, BdbWidgetOptions } from '../types'
 
-const capitalize = (string: string): string => {
-  return string.charAt(0).toUpperCase() + string.slice(1)
-}
+// const capitalize = (string: string): string => {
+//   return string.charAt(0).toUpperCase() + string.slice(1)
+// }
 
 export const alarms_table = (boat: BdbBoat, options: BdbWidgetOptions) => {
   const sizeX = options.sizeX || 16
