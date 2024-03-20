@@ -22,6 +22,7 @@ import {
   TbAuthorityEnum,
   TbEntityEnum,
   TbProvisionTypeEnum,
+  TbRelationDirectionEnum,
   TbRelationTypeGroupEnum,
   TbScopeEnum,
   TbTransportEnum,
@@ -35,14 +36,44 @@ import {
   TbDeviceProfile,
   TbDeviceProfileAlarm,
 } from './interfaces/device-profile'
-import { TbRelation } from './interfaces/relation'
+import {
+  TbEntityRelationsQuery,
+  TbRelation,
+  TbEntityRelation,
+} from './interfaces/relation'
 import { TbTimeseriesData, TbTimeseriesValue } from './interfaces/telemetry'
 import { TbUser, TbUserActivationLink } from './interfaces/user'
+
+// utils
+import { recursiveKeyFilter } from './utils'
 
 // constants
 import { URI_MAPPING } from './uri-mapping'
 import { TbRuleChain, TbRuleChainMetaData } from './interfaces/rule-chains'
 import { RuleChainMetaData } from '../types'
+
+// helper functions
+export const dashboardStripDown = (c: any): any => {
+  return recursiveKeyFilter(
+    {
+      ...c,
+      widgets: _.values(c.widgets),
+      entityAliases: _.values(c.entityAliases),
+      states: {},
+    },
+    ['id', 'entityId', 'entityAliasId'],
+  )
+}
+
+export const dashboardConfigurationIsEqual = (
+  config1: any,
+  config2: any,
+): boolean => {
+  return (
+    JSON.stringify(dashboardStripDown(config1)) ===
+    JSON.stringify(dashboardStripDown(config2))
+  )
+}
 
 export class TbApi {
   private readonly clientType: TbClientType
@@ -897,37 +928,85 @@ export class TbApi {
     }
   }
 
-  async upsertDashboard(dashboard: any): Promise<TbDashboardInfo> {
-    const tbDashboardInfos =
-      await this.getEntities<TbDashboardInfo>('dashboard')
-    const tbDashboardInfo = _.find(tbDashboardInfos, { title: dashboard.title })
-
-    if (tbDashboardInfo) {
-      const tbDashboard = await this.getEntity<TbDashboard>(
-        'dashboard',
-        {
-          params: { inlineImages: true },
-        },
-        tbDashboardInfo.id?.id,
-      )
-
-      const dashboardConfiguration = dashboard.configuration
-      const currentConfiguration = tbDashboard?.configuration
-
-      if (_.isEqual(dashboardConfiguration, currentConfiguration)) {
-        this.logger.info(`Dashboard ${dashboard.title}: In sync`)
-        return tbDashboardInfo
-      } else {
-        this.logger.info(`Dashboard ${dashboard.title}: Updating configuration`)
-        return await this.upsertEntity<TbDashboard>('dashboard', {
-          ...tbDashboardInfo,
-          configuration: dashboardConfiguration,
-        })
+  async upsertDashboard(
+    dashboard: any,
+    customerId?: string,
+  ): Promise<TbDashboard> {
+    let tbDashboardInfos: TbDashboardInfo[] = []
+    if (customerId) {
+      // only search in dashboards belonging to the customer
+      let hasNext = true
+      let page = 0
+      let tbPage: TbPageData<TbDashboardInfo>
+      while (hasNext) {
+        const response: AxiosResponse<TbPageData<TbDashboardInfo>> =
+          await this.api.get<TbPageData<TbDashboardInfo>>(
+            `api/customer/${customerId}/dashboards`,
+            {
+              params: { pageSize: 100, page },
+            },
+          )
+        tbPage = response.data
+        tbDashboardInfos.push(...tbPage.data)
+        hasNext = tbPage.hasNext
+        page += 1
       }
+    } else {
+      // search all tenant accessable dashboards
+      tbDashboardInfos = await this.getEntities<TbDashboardInfo>('dashboard')
+    }
+    const tbDashboardInfo = _.find(tbDashboardInfos, { title: dashboard.title })
+    const tbDashboardInfoId = tbDashboardInfo?.id?.id
+
+    let tbDashboard: TbDashboard | undefined
+    if (tbDashboardInfoId) {
+      tbDashboard = await this.getEntity<TbDashboard>(
+        'dashboard',
+        { params: { inlineImages: true } },
+        tbDashboardInfoId,
+      )
     }
 
-    this.logger.info(`Dashboard ${dashboard.title}: Creating new dashboard.`)
-    return await this.upsertEntity<TbDashboardInfo>('dashboard', dashboard)
+    if (tbDashboard) {
+      let inSync: boolean = true
+
+      const rootProps: (keyof TbDashboard)[] = [
+        'title',
+        'name',
+        'image',
+        'mobileHide',
+        'mobileOrder',
+      ]
+      for (const rootProp of rootProps) {
+        if (dashboard[rootProp] !== tbDashboard[rootProp]) {
+          this.logger.info(`Dashboard ${dashboard.title}: Updating ${rootProp}`)
+          ;(tbDashboard as any)[rootProp] = dashboard[rootProp]
+          inSync = false
+        }
+      }
+
+      if (
+        !dashboardConfigurationIsEqual(
+          dashboard.configuration || {},
+          tbDashboard.configuration || {},
+        )
+      ) {
+        this.logger.info(`Dashboard ${dashboard.title}: Updating configuration`)
+        tbDashboard.configuration = dashboard.configuration
+        inSync = false
+      }
+      if (inSync) {
+        this.logger.info(`Dashboard ${dashboard.title}: In sync`)
+      } else {
+        this.logger.info(`Dashboard ${dashboard.title}: Updating configuration`)
+        return await this.upsertEntity<TbDashboard>('dashboard', tbDashboard)
+      }
+    } else {
+      this.logger.info(`Dashboard ${dashboard.title}: Creating new dashboard.`)
+      tbDashboard = await this.upsertEntity<TbDashboard>('dashboard', dashboard)
+    }
+
+    return tbDashboard
   }
 
   async assignDashboardToCustomer(dashboardId: string, customerTitle: string) {
@@ -1004,6 +1083,151 @@ export class TbApi {
     await this.api.post(`/api/customer/${customerId}/asset/${assetId}`)
   }
 
+  async relateAssetToCustomer(
+    assetName: string,
+    customerTitle: string,
+  ): Promise<TbRelation> {
+    this.logger.info(`Relating asset ${assetName} to asset ${customerTitle}`)
+
+    const tbAssetId = await this.getCachedAssetId(assetName)
+    const tbCustomerId = await this.getCachedCustomerId(customerTitle)
+
+    let tbRelation
+    try {
+      tbRelation = await this.getEntity<TbRelation>('relation', {
+        params: {
+          fromId: tbCustomerId,
+          fromType: TbEntityEnum.CUSTOMER,
+          toId: tbAssetId,
+          toType: TbEntityEnum.ASSET,
+          relationType: 'Owns',
+          relationTypeGroup: TbRelationTypeGroupEnum.COMMON,
+        },
+      })
+    } catch (error) {
+      if (isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          this.logger.info(
+            `Relation customer ${customerTitle} → asset ${assetName}: Does not exist yet`,
+          )
+        }
+      } else {
+        throw error
+      }
+    }
+
+    if (tbRelation) {
+      this.logger.warn(
+        `Relation customer ${customerTitle} → asset ${assetName}: Already exists`,
+      )
+      return tbRelation
+    }
+
+    return await this.upsertEntity<TbRelation>('relation', {
+      from: {
+        id: tbCustomerId,
+        entityType: TbEntityEnum.CUSTOMER,
+      },
+      to: {
+        id: tbAssetId,
+        entityType: TbEntityEnum.ASSET,
+      },
+      type: 'Owns',
+      typeGroup: TbRelationTypeGroupEnum.COMMON,
+      additionalInfo: {},
+    })
+  }
+
+  async findCustomerRelatedAssets(customerTitle: string): Promise<TbAsset[]> {
+    const customerId = await this.getCachedCustomerId(customerTitle)
+
+    const query: TbEntityRelationsQuery = {
+      parameters: {
+        rootId: customerId,
+        rootType: TbEntityEnum.CUSTOMER,
+        direction: TbRelationDirectionEnum.FROM,
+        relationTypeGroup: TbRelationTypeGroupEnum.COMMON,
+        fetchLastLevelOnly: false,
+      },
+      filters: [
+        {
+          relationType: 'Owns',
+          entityTypes: [TbEntityEnum.ASSET],
+        },
+      ],
+    }
+
+    const result = await this.api.post<TbEntityRelation[]>(
+      'api/relations',
+      query,
+    )
+
+    this.logger.info(
+      `Customer ${customerTitle}: Found ${result.data.length} assets`,
+    )
+
+    const assets: TbAsset[] = []
+    for (const tbEntityRelation of result.data) {
+      const asset = await this.getEntity<TbAsset>(
+        'asset',
+        {},
+        tbEntityRelation.to?.id,
+      )
+      if (!asset) {
+        throw new Error(
+          `Customer ${customerTitle}: Asset ${tbEntityRelation.to?.id} not found in asset list`,
+        )
+      }
+      assets.push(asset)
+    }
+
+    return assets
+  }
+
+  async findAssetRelatedDevices(assetName: string): Promise<TbDevice[]> {
+    const assetId = await this.getCachedAssetId(assetName)
+
+    const query: TbEntityRelationsQuery = {
+      parameters: {
+        rootId: assetId,
+        rootType: TbEntityEnum.ASSET,
+        direction: TbRelationDirectionEnum.FROM,
+        relationTypeGroup: TbRelationTypeGroupEnum.COMMON,
+        fetchLastLevelOnly: false,
+      },
+      filters: [
+        {
+          relationType: 'Contains',
+          entityTypes: [TbEntityEnum.DEVICE],
+        },
+      ],
+    }
+
+    const result = await this.api.post<TbEntityRelation[]>(
+      'api/relations',
+      query,
+    )
+
+    this.logger.info(`Asset ${assetName}: Found ${result.data.length} devices`)
+
+    const devices: TbDevice[] = []
+    for (const tbEntityRelation of result.data) {
+      const device = await this.getEntity<TbDevice>(
+        'device',
+        {},
+        tbEntityRelation.to?.id,
+      )
+      if (!device) {
+        throw new Error(
+          `Asset ${assetName}: Device ${tbEntityRelation.to?.id} not found in device list`,
+        )
+      }
+      devices.push(device)
+    }
+
+    return devices
+  }
+
   async claimDevice(deviceName: string, secretKey: string): Promise<void> {
     this.logger.info(`Claiming device ${deviceName}`)
 
@@ -1035,11 +1259,11 @@ export class TbApi {
     }
   }
 
-  async assignDeviceToAsset(
+  async relateDeviceToAsset(
     deviceName: string,
     assetName: string,
   ): Promise<TbRelation> {
-    this.logger.info(`Assigning device ${deviceName} to asset ${assetName}`)
+    this.logger.info(`Relating device ${deviceName} to asset ${assetName}`)
 
     const tbDevices = await this.getEntities<TbDevice>('device')
     const tbDevice = _.find(tbDevices, { name: deviceName }) as TbDevice

@@ -3,7 +3,7 @@ import { MetricBehaviors } from '../types'
 export const metricBehaviors: MetricBehaviors = {
   battery_level: { min: 20, max: 100, step: 0.1, start: 98, trend: 'down' },
   battery_voltage: {
-    min: 10.8,
+    min: 10.0,
     max: 15.0,
     step: 0.01,
     start: 13.4,

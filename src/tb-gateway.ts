@@ -44,6 +44,10 @@ export class TbGateway {
     this.url = url
 
     // initialize device state with metric default start values
+    this.initializeStartState()
+  }
+
+  initializeStartState() {
     this.state = _.chain(devices)
       .map(d => ({
         name: d.name,
@@ -59,6 +63,15 @@ export class TbGateway {
         }),
       }))
       .value()
+  }
+
+  resetStartValues() {
+    _.chain(this.state).each(device => {
+      _.each(device.current, (value, metric) => {
+        device.current[metric] =
+          metricBehaviors[metric as keyof typeof metricBehaviors].start
+      })
+    })
   }
 
   setState(state: {
@@ -325,6 +338,51 @@ export class TbGateway {
         )
       })
     })
+
+    // const cycleIsFinished = _.every(this.state, (device, name) => {
+    //   return _.every(device.current, (value, metric) => {
+    //     const metricBehavior =
+    //       metricBehaviors[metric as keyof typeof metricBehaviors]
+    //     if (!metricBehavior) {
+    //       throw new Error(`No behavior found for metric ${metric}`)
+    //     }
+    //     const targetEnabled = device.targetEnabled || false
+    //     if (!targetEnabled && metricBehavior.trend !== 'down') {
+    //       return true
+    //     }
+    //     const target = device.target?.[metric]
+    //     const min = metricBehavior.min
+    //     const max = metricBehavior.max
+
+    //     const isCloseTo = (compare: [string, number]) => {
+    //       const [compareLabel, compareValue] = compare
+    //       const percentage =
+    //         (100 * Math.abs(value - compareValue)) / Math.abs(max - min)
+    //       this.logger.debug(
+    //         `Device ${name}: Metric ${metric} compare ${compareLabel}: ${percentage.toFixed(2)}%`,
+    //       )
+    //       return percentage < 2
+    //     }
+
+    //     this.logger.debug(
+    //       `Device ${name}: Metric ${metric} value ${value}, min ${min}, max ${max}, target ${target}, enabled ${targetEnabled}`,
+    //     )
+    //     return _.some(
+    //       [
+    //         ['min', min],
+    //         ['target', target],
+    //       ],
+    //       isCloseTo,
+    //     )
+    //   })
+    // })
+
+    // if (cycleIsFinished) {
+    //   this.logger.info(
+    //     'Cycle is finished, all metrics are at min/max/target. Initializing start state.',
+    //   )
+    //   this.resetStartValues()
+    // }
   }
 
   private getNewStateValue(

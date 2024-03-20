@@ -7,6 +7,7 @@ export type TbShortCustomerInfo = {
 }
 
 export type TbDashboard = {
+  id?: TbEntityId
   createdTime?: number
   tenantId?: TbEntityId
   name?: string

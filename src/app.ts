@@ -9,13 +9,14 @@ import { TbGateway } from './tb-gateway'
 import { assetProfiles } from './constants/asset-profiles'
 import { assets } from './constants/assets'
 import { customerAlarmSettings, customers } from './constants/customers'
-import { dashboardMap } from './constants/dashboards'
+import { dashboardMap, renderBoatDashboard } from './constants/dashboards'
 import { deviceProfiles } from './constants/device-profiles'
 import { devices } from './constants/devices'
 import { ruleChainMetaData } from './constants/rule-chain-meta-data'
 import { TbEntityEnum, TbScopeEnum } from './tb-api/interfaces/enums'
 import { users } from './constants/users'
 import { TbRuleChain } from './tb-api/interfaces/rule-chains'
+import { TbCustomer } from './tb-api/interfaces/customer'
 
 const logger = pino({
   level:
@@ -101,33 +102,30 @@ const boostrap = async () => {
   )
 
   // add customers
-  const tbCustomers = await Promise.all(
-    _.map(customers, customer => tenantApi.upsertCustomer(customer.title)),
-  )
-
-  // set customer attributes
-  for (const tbCustomer of tbCustomers) {
+  const tbCustomers: TbCustomer[] = []
+  for (const customer of customers) {
+    const tbCustomer = await tenantApi.upsertCustomer(customer.title)
+    tbCustomers.push(tbCustomer)
     const customerId = tbCustomer.id?.id || 'unknown'
+
+    // set customer attributes
     await tenantApi.setEntityAttributes(
       customerId,
       customerAlarmSettings,
       TbEntityEnum.CUSTOMER,
       TbScopeEnum.SERVER_SCOPE,
     )
-  }
 
-  // assign assets to customer
-  for (const customer of customers) {
     const customerAssets = _.filter(
       assets,
       asset => asset.label === customer.boat,
     )
 
-    await Promise.all(
-      _.map(customerAssets, customerAsset =>
-        tenantApi.assignAssetToCustomer(customerAsset.name, customer.title),
-      ),
-    )
+    // assign assets to customer
+    for (const customerAsset of customerAssets) {
+      await tenantApi.assignAssetToCustomer(customerAsset.name, customer.title)
+      await tenantApi.relateAssetToCustomer(customerAsset.name, customer.title)
+    }
   }
 
   // add users
@@ -151,10 +149,10 @@ const boostrap = async () => {
     for (const dashboard of dashboards) {
       const db = await tenantApi.upsertDashboard(dashboard)
       if (dashboardUser === 'customer') {
-        for (const customer of customers) {
+        for (const tbCustomer of tbCustomers) {
           await tenantApi.assignDashboardToCustomer(
             db.id?.id || 'unknown',
-            customer.title,
+            tbCustomer.title,
           )
         }
       }
@@ -199,12 +197,44 @@ const boostrap = async () => {
           // todo: regenerate customer dashboards
 
           // update the relation
-          await api.assignDeviceToAsset(name, asset.name)
+          await api.relateDeviceToAsset(name, asset.name)
 
           // set user specific device label
           await api.setDeviceLabel(name, label)
         }
       }
+    }
+  }
+
+  // setup asset specific dashboards
+  for (const tbCustomer of tbCustomers) {
+    const tbAssets = await tenantApi.findCustomerRelatedAssets(tbCustomer.title)
+
+    for (const tbAsset of _.filter(tbAssets, { type: 'Boat' })) {
+      const tbDevices = await tenantApi.findAssetRelatedDevices(tbAsset.name)
+
+      const boat = {
+        id: tbAsset.id?.id || 'unknown',
+        name: tbAsset.name,
+        label: tbAsset.label || 'unknown',
+      }
+
+      const devices = _.map(tbDevices, tbDevice => ({
+        id: tbDevice.id?.id || 'unknown',
+        name: tbDevice.name,
+        label: tbDevice.label || 'unknown',
+        type: tbDevice.type || 'unknown',
+      }))
+
+      const boatDashboard = renderBoatDashboard(boat, devices)
+      const db = await tenantApi.upsertDashboard(
+        boatDashboard,
+        tbCustomer.id?.id,
+      )
+      await tenantApi.assignDashboardToCustomer(
+        db.id?.id || 'unknown',
+        tbCustomer.title,
+      )
     }
   }
 
