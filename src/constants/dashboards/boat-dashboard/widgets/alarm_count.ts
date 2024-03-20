@@ -120,8 +120,9 @@ export const alarm_count = (asset: BdbBoat, options: BdbWidgetOptions) => {
         iconBackgroundSize: 36,
         iconBackgroundSizeUnit: 'px',
         iconBackgroundColor: {
-          type: 'range',
-          color: 'rgba(0, 105, 92, 1)',
+          // type: 'range',
+          type: 'constant',
+          color: severityColor,
           rangeList: [
             {
               from: 0,

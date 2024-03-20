@@ -9,7 +9,7 @@ import axios, {
 } from 'axios'
 import * as _ from 'lodash'
 import * as querystring from 'querystring'
-import { inspect } from 'util'
+// import { inspect } from 'util'
 
 // types
 import { TbClientType, TbApiEntity } from './types'
@@ -44,10 +44,36 @@ import {
 import { TbTimeseriesData, TbTimeseriesValue } from './interfaces/telemetry'
 import { TbUser, TbUserActivationLink } from './interfaces/user'
 
+// utils
+import { recursiveKeyFilter } from './utils'
+
 // constants
 import { URI_MAPPING } from './uri-mapping'
 import { TbRuleChain, TbRuleChainMetaData } from './interfaces/rule-chains'
 import { RuleChainMetaData } from '../types'
+
+// helper functions
+export const dashboardStripDown = (c: any): any => {
+  return recursiveKeyFilter(
+    {
+      ...c,
+      widgets: _.values(c.widgets),
+      entityAliases: _.values(c.entityAliases),
+      states: {},
+    },
+    ['id', 'entityId', 'entityAliasId'],
+  )
+}
+
+export const dashboardConfigurationIsEqual = (
+  config1: any,
+  config2: any,
+): boolean => {
+  return (
+    JSON.stringify(dashboardStripDown(config1)) ===
+    JSON.stringify(dashboardStripDown(config2))
+  )
+}
 
 export class TbApi {
   private readonly clientType: TbClientType
@@ -902,37 +928,85 @@ export class TbApi {
     }
   }
 
-  async upsertDashboard(dashboard: any): Promise<TbDashboardInfo> {
-    const tbDashboardInfos =
-      await this.getEntities<TbDashboardInfo>('dashboard')
-    const tbDashboardInfo = _.find(tbDashboardInfos, { title: dashboard.title })
-
-    if (tbDashboardInfo) {
-      const tbDashboard = await this.getEntity<TbDashboard>(
-        'dashboard',
-        {
-          params: { inlineImages: true },
-        },
-        tbDashboardInfo.id?.id,
-      )
-
-      const dashboardConfiguration = dashboard.configuration
-      const currentConfiguration = tbDashboard?.configuration
-
-      if (_.isEqual(dashboardConfiguration, currentConfiguration)) {
-        this.logger.info(`Dashboard ${dashboard.title}: In sync`)
-        return tbDashboardInfo
-      } else {
-        this.logger.info(`Dashboard ${dashboard.title}: Updating configuration`)
-        return await this.upsertEntity<TbDashboard>('dashboard', {
-          ...tbDashboardInfo,
-          configuration: dashboardConfiguration,
-        })
+  async upsertDashboard(
+    dashboard: any,
+    customerId?: string,
+  ): Promise<TbDashboard> {
+    let tbDashboardInfos: TbDashboardInfo[] = []
+    if (customerId) {
+      // only search in dashboards belonging to the customer
+      let hasNext = true
+      let page = 0
+      let tbPage: TbPageData<TbDashboardInfo>
+      while (hasNext) {
+        const response: AxiosResponse<TbPageData<TbDashboardInfo>> =
+          await this.api.get<TbPageData<TbDashboardInfo>>(
+            `api/customer/${customerId}/dashboards`,
+            {
+              params: { pageSize: 100, page },
+            },
+          )
+        tbPage = response.data
+        tbDashboardInfos.push(...tbPage.data)
+        hasNext = tbPage.hasNext
+        page += 1
       }
+    } else {
+      // search all tenant accessable dashboards
+      tbDashboardInfos = await this.getEntities<TbDashboardInfo>('dashboard')
+    }
+    const tbDashboardInfo = _.find(tbDashboardInfos, { title: dashboard.title })
+    const tbDashboardInfoId = tbDashboardInfo?.id?.id
+
+    let tbDashboard: TbDashboard | undefined
+    if (tbDashboardInfoId) {
+      tbDashboard = await this.getEntity<TbDashboard>(
+        'dashboard',
+        { params: { inlineImages: true } },
+        tbDashboardInfoId,
+      )
     }
 
-    this.logger.info(`Dashboard ${dashboard.title}: Creating new dashboard.`)
-    return await this.upsertEntity<TbDashboardInfo>('dashboard', dashboard)
+    if (tbDashboard) {
+      let inSync: boolean = true
+
+      const rootProps: (keyof TbDashboard)[] = [
+        'title',
+        'name',
+        'image',
+        'mobileHide',
+        'mobileOrder',
+      ]
+      for (const rootProp of rootProps) {
+        if (dashboard[rootProp] !== tbDashboard[rootProp]) {
+          this.logger.info(`Dashboard ${dashboard.title}: Updating ${rootProp}`)
+          ;(tbDashboard as any)[rootProp] = dashboard[rootProp]
+          inSync = false
+        }
+      }
+
+      if (
+        !dashboardConfigurationIsEqual(
+          dashboard.configuration || {},
+          tbDashboard.configuration || {},
+        )
+      ) {
+        this.logger.info(`Dashboard ${dashboard.title}: Updating configuration`)
+        tbDashboard.configuration = dashboard.configuration
+        inSync = false
+      }
+      if (inSync) {
+        this.logger.info(`Dashboard ${dashboard.title}: In sync`)
+      } else {
+        this.logger.info(`Dashboard ${dashboard.title}: Updating configuration`)
+        return await this.upsertEntity<TbDashboard>('dashboard', tbDashboard)
+      }
+    } else {
+      this.logger.info(`Dashboard ${dashboard.title}: Creating new dashboard.`)
+      tbDashboard = await this.upsertEntity<TbDashboard>('dashboard', dashboard)
+    }
+
+    return tbDashboard
   }
 
   async assignDashboardToCustomer(dashboardId: string, customerTitle: string) {

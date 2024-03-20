@@ -1,7 +1,7 @@
 import pino from 'pino'
 import { v4 } from 'uuid'
 import _ from 'lodash'
-import { inspect } from 'util'
+// import { inspect } from 'util'
 
 import { settings } from './settings'
 import { timewindow } from './timewindow'
@@ -171,7 +171,7 @@ export const renderBoatDashboard = (
 
   return {
     title: boat.label,
-    name: boat.name,
+    name: boat.label,
     image: null,
     mobileHide: false,
     mobileOrder: null,

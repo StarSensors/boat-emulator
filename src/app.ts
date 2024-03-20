@@ -159,35 +159,6 @@ const boostrap = async () => {
     }
   }
 
-  // setup asset specific dashboards
-  for (const tbCustomer of tbCustomers) {
-    const tbAssets = await tenantApi.findCustomerRelatedAssets(tbCustomer.title)
-
-    for (const tbAsset of _.filter(tbAssets, { type: 'Boat' })) {
-      const tbDevices = await tenantApi.findAssetRelatedDevices(tbAsset.name)
-
-      const boat = {
-        id: tbAsset.id?.id || 'unknown',
-        name: tbAsset.name,
-        label: tbAsset.label || 'unknown',
-      }
-
-      const devices = _.map(tbDevices, tbDevice => ({
-        id: tbDevice.id?.id || 'unknown',
-        name: tbDevice.name,
-        label: tbDevice.label || 'unknown',
-        type: tbDevice.type || 'unknown',
-      }))
-
-      const boatDashboard = renderBoatDashboard(boat, devices)
-      const db = await tenantApi.upsertDashboard(boatDashboard)
-      await tenantApi.assignDashboardToCustomer(
-        db.id?.id || 'unknown',
-        tbCustomer.title,
-      )
-    }
-  }
-
   // user apis
   const userApis = _.map(users, user => ({
     ...user,
@@ -235,84 +206,116 @@ const boostrap = async () => {
     }
   }
 
-  // add gateway device (will be used to send data to ThingsBoard)
-  const tbGatewayDevice = await tenantApi.upsertGatewayDevice(
-    'Boat Emulator Gateway',
-  )
+  // setup asset specific dashboards
+  for (const tbCustomer of tbCustomers) {
+    const tbAssets = await tenantApi.findCustomerRelatedAssets(tbCustomer.title)
 
-  // update or set getway device initial state
-  const state: {
-    [key: string]: {
-      current: { [key: string]: number }
-      target: { [key: string]: number }
-      targetEnabled: boolean
-    }
-  } = {}
-  for (const tbDevice of tBdevices) {
-    const deviceId = tbDevice.id?.id || 'unknown'
+    for (const tbAsset of _.filter(tbAssets, { type: 'Boat' })) {
+      const tbDevices = await tenantApi.findAssetRelatedDevices(tbAsset.name)
 
-    // get device attributes
-    const deviceAttrs = await tenantApi.getEntityAttributes(
-      deviceId,
-      TbEntityEnum.DEVICE,
-    )
+      const boat = {
+        id: tbAsset.id?.id || 'unknown',
+        name: tbAsset.name,
+        label: tbAsset.label || 'unknown',
+      }
 
-    // get target information from devices attributes
-    // target enabled
-    const targetEnabled =
-      !!_.find(deviceAttrs, { key: 'target_enabled' })?.value || false
+      const devices = _.map(tbDevices, tbDevice => ({
+        id: tbDevice.id?.id || 'unknown',
+        name: tbDevice.name,
+        label: tbDevice.label || 'unknown',
+        type: tbDevice.type || 'unknown',
+      }))
 
-    const targetMap = _.chain(deviceAttrs)
-      .filter(
-        attr => attr.key.startsWith('target_') && attr.key !== 'target_enabled',
+      const boatDashboard = renderBoatDashboard(boat, devices)
+      const db = await tenantApi.upsertDashboard(
+        boatDashboard,
+        tbCustomer.id?.id,
       )
-      .map(attr => [attr.key.replace('target_', ''), attr.value])
-      .fromPairs()
-      .value()
-
-    // get latest timeseries data
-    const latestTimeseries = await tenantApi.getLatestTimeseries(deviceId)
-
-    // get map of latest timeseries values
-    const latestMap = _.mapValues(latestTimeseries, value => value?.value || 0)
-
-    // use target in preference to latest timeseries
-    const newAttrsMap = {
-      ..._.mapValues(latestMap, value => Math.round((value || 0) * 10) / 10), // rounded target values
-      ...targetMap,
-      enabled: targetEnabled,
-    }
-
-    // update target metric values in device attributes
-    const newAttributes = _.mapKeys(
-      newAttrsMap,
-      (value, metric) => `target_${metric}`,
-    )
-    await tenantApi.setEntityAttributes(
-      tbDevice.id?.id || 'unknown',
-      newAttributes,
-      TbEntityEnum.DEVICE,
-      TbScopeEnum.SHARED_SCOPE,
-    )
-
-    // set device latets timeseries
-    state[tbDevice.name] = {
-      current: latestMap,
-      target: targetMap,
-      targetEnabled,
+      await tenantApi.assignDashboardToCustomer(
+        db.id?.id || 'unknown',
+        tbCustomer.title,
+      )
     }
   }
 
-  // set the latest timeseries
-  // (else jumps in the graph will be seen when the gateway starts sending data)
-  tbGateway.setState(state)
+  // // add gateway device (will be used to send data to ThingsBoard)
+  // const tbGatewayDevice = await tenantApi.upsertGatewayDevice(
+  //   'Boat Emulator Gateway',
+  // )
 
-  // start the gateway
-  const accessToken = await tenantApi.getCachedDeviceAccessToken(
-    tbGatewayDevice.name,
-    tbGatewayDevice.id?.id || 'unknown',
-  )
-  tbGateway.start(accessToken)
+  // // update or set getway device initial state
+  // const state: {
+  //   [key: string]: {
+  //     current: { [key: string]: number }
+  //     target: { [key: string]: number }
+  //     targetEnabled: boolean
+  //   }
+  // } = {}
+  // for (const tbDevice of tBdevices) {
+  //   const deviceId = tbDevice.id?.id || 'unknown'
+
+  //   // get device attributes
+  //   const deviceAttrs = await tenantApi.getEntityAttributes(
+  //     deviceId,
+  //     TbEntityEnum.DEVICE,
+  //   )
+
+  //   // get target information from devices attributes
+  //   // target enabled
+  //   const targetEnabled =
+  //     !!_.find(deviceAttrs, { key: 'target_enabled' })?.value || false
+
+  //   const targetMap = _.chain(deviceAttrs)
+  //     .filter(
+  //       attr => attr.key.startsWith('target_') && attr.key !== 'target_enabled',
+  //     )
+  //     .map(attr => [attr.key.replace('target_', ''), attr.value])
+  //     .fromPairs()
+  //     .value()
+
+  //   // get latest timeseries data
+  //   const latestTimeseries = await tenantApi.getLatestTimeseries(deviceId)
+
+  //   // get map of latest timeseries values
+  //   const latestMap = _.mapValues(latestTimeseries, value => value?.value || 0)
+
+  //   // use target in preference to latest timeseries
+  //   const newAttrsMap = {
+  //     ..._.mapValues(latestMap, value => Math.round((value || 0) * 10) / 10), // rounded target values
+  //     ...targetMap,
+  //     enabled: targetEnabled,
+  //   }
+
+  //   // update target metric values in device attributes
+  //   const newAttributes = _.mapKeys(
+  //     newAttrsMap,
+  //     (value, metric) => `target_${metric}`,
+  //   )
+  //   await tenantApi.setEntityAttributes(
+  //     tbDevice.id?.id || 'unknown',
+  //     newAttributes,
+  //     TbEntityEnum.DEVICE,
+  //     TbScopeEnum.SHARED_SCOPE,
+  //   )
+
+  //   // set device latets timeseries
+  //   state[tbDevice.name] = {
+  //     current: latestMap,
+  //     target: targetMap,
+  //     targetEnabled,
+  //   }
+  // }
+
+  // // set the latest timeseries
+  // // (else jumps in the graph will be seen when the gateway starts sending data)
+  // tbGateway.setState(state)
+
+  // // start the gateway
+  // const accessToken = await tenantApi.getCachedDeviceAccessToken(
+  //   tbGatewayDevice.name,
+  //   tbGatewayDevice.id?.id || 'unknown',
+  // )
+  // tbGateway.start(accessToken)
 }
 
 boostrap()
